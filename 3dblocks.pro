@@ -1,5 +1,5 @@
 TEMPLATE = app
-TARGET = name_of_the_app
+TARGET = 3DBlocks
 
 QT = core gui
 
@@ -9,14 +9,14 @@ greaterThan(QT_MAJOR_VERSION, 5): QT += widgets
 QT += opengl
 QT += openglwidgets
 SOURCES += \
-    geometryengine.cpp \
-    main.cpp \
-    mainwidget.cpp
+    src/geometryengine.cpp \
+    src/main.cpp \
+    src/mainwidget.cpp
 
 HEADERS += \
-    geometryengine.h \
-    mainwidget.h
+    headers/geometryengine.h \
+    headers/mainwidget.h
 
 RESOURCES += \
-    fshader.glsl \
-    vshader.glsl
+    shaders/fshader.glsl \
+    shaders/vshader.glsl

@@ -1,7 +1,7 @@
 // Copyright (C) 2016 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
 
-#include "geometryengine.h"
+#include "../headers/geometryengine.h"
 
 #include <QVector2D>
 #include <QVector3D>
