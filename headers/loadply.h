@@ -8,21 +8,7 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLBuffer>
 
-struct PlyVertex {
-    float x, y, z;
-};
 
-struct PlyFace {
-    int vertexIndex1, vertexIndex2, vertexIndex3;
-};
-
-struct PlyNormal {
-    float nx, ny, nz;
-};
-
-struct PlyColor {
-    int r,g, b;
-};
 
 class loadPLY {
 public:

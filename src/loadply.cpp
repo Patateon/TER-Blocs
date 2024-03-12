@@ -59,17 +59,17 @@ void loadPLY::loadPlyFile(const std::string& filename) {
         }
         else if (isReadingVertices&&count_vertex<nbVertices)
         {
-            PlyVertex vertex;
-            PlyColor color;
-            PlyNormal normal;
+            float x,y,z;
+            int r,g,b;
+            float nx,ny,nz;
             // Assuming the format is "x y z"
             //vertex.x=std::stod(keyword);
-            iss >>vertex.x>> vertex.y >> vertex.z;
-            iss >>color.r>> color.g >> color.b;
-            iss >>normal.nx>> normal.ny >> normal.nz;
-            vertices.append(QVector3D(vertex.x,vertex.y,vertex.z));
-            colors.append(QVector3D(color.r,color.g,color.b));
-            normals.append(QVector3D(normal.nx,normal.ny,normal.nz));
+            iss >>x>>y >> z;
+            iss >>r>> g >> b;
+            iss >>nx>> ny >> nz;
+            vertices.append(QVector3D(x,y,z));
+            colors.append(QVector3D(r,g,b));
+            normals.append(QVector3D(nx,ny,nz));
             count_vertex++;
         }
         else if (count_vertex>=nbVertices)
@@ -82,9 +82,9 @@ void loadPLY::loadPlyFile(const std::string& filename) {
             // Assuming triangular faces, read and store indices in a new PlyFace
             if (faceVertices == 3)
             {
-                PlyFace face;
-                iss >> face.vertexIndex1 >> face.vertexIndex2 >> face.vertexIndex3;
-                faces.append(QVector3D(face.vertexIndex1,face.vertexIndex2,face.vertexIndex3));
+                int i0,i1,i2;
+                iss >> i0 >> i1 >> i2;
+                faces.append(QVector3D(i0,i1,i2));
             }
         }
 
@@ -96,29 +96,45 @@ void loadPLY::loadPlyFile(const std::string& filename) {
     qDebug() << "Number of faces : " << nbFaces;
     qDebug() << "Number of faces read: " << faces.size();
     qDebug() << "Vertices at indices 0, 10, and 50:";
-
+    qDebug() << vertices[0];
     qDebug() << "File loaded successfully: " << QString::fromStdString(filename);
 
     arrayBuf.create();
     arrayBuf.bind();
-    arrayBuf.allocate(vertices.data(), vertices.size() * sizeof(PlyVertex));
+    arrayBuf.allocate(vertices.data(), vertices.size() * sizeof(QVector3D));
 
     indexBuf.create();
     indexBuf.bind();
-    indexBuf.allocate(faces.data(), faces.size() * sizeof(PlyFace));
+    indexBuf.allocate(faces.data(), faces.size() * sizeof(QVector3D));
 }
 
 void loadPLY::drawPlyGeometry(QOpenGLShaderProgram *program) {
     arrayBuf.bind();
     indexBuf.bind();
 
+    // Activer et lier les données de sommet
     int vertexLocation = program->attributeLocation("vertex");
     program->enableAttributeArray(vertexLocation);
-    program->setAttributeBuffer(vertexLocation, GL_FLOAT, 0, 3, sizeof(PlyVertex));
+    program->setAttributeBuffer(vertexLocation, GL_FLOAT, 0, 3, sizeof(QVector3D));
+
+    // Activer et lier les données de couleur
+    int colorLocation = program->attributeLocation("color");
+    program->enableAttributeArray(colorLocation);
+    program->setAttributeBuffer(colorLocation, GL_FLOAT, sizeof(QVector3D), 3, sizeof(QVector3D));
+
+    // Activer et lier les données de normale
+    int normalLocation = program->attributeLocation("normal");
+    program->enableAttributeArray(normalLocation);
+    program->setAttributeBuffer(normalLocation, GL_FLOAT, 2 * sizeof(QVector3D), 3, sizeof(QVector3D));
 
     qDebug() << "Drawing PLY geometry with " << faces.size() << " faces";
 
+    // Dessiner les éléments
     glDrawElements(GL_TRIANGLES, faces.size() * 3, GL_UNSIGNED_INT, 0);
 
+    // Désactiver les attributs
     program->disableAttributeArray(vertexLocation);
+    program->disableAttributeArray(colorLocation);
+    program->disableAttributeArray(normalLocation);
 }
+
