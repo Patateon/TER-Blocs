@@ -67,9 +67,9 @@ void loadPLY::loadPlyFile(const std::string& filename) {
             iss >>vertex.x>> vertex.y >> vertex.z;
             iss >>color.r>> color.g >> color.b;
             iss >>normal.nx>> normal.ny >> normal.nz;
-            vertices.push_back(vertex);
-            colors.push_back(color);
-            normals.push_back(normal);
+            vertices.append(QVector3D(vertex.x,vertex.y,vertex.z));
+            colors.append(QVector3D(color.r,color.g,color.b));
+            normals.append(QVector3D(normal.nx,normal.ny,normal.nz));
             count_vertex++;
         }
         else if (count_vertex>=nbVertices)
@@ -84,7 +84,7 @@ void loadPLY::loadPlyFile(const std::string& filename) {
             {
                 PlyFace face;
                 iss >> face.vertexIndex1 >> face.vertexIndex2 >> face.vertexIndex3;
-                faces.push_back(face);
+                faces.append(QVector3D(face.vertexIndex1,face.vertexIndex2,face.vertexIndex3));
             }
         }
 
@@ -96,12 +96,6 @@ void loadPLY::loadPlyFile(const std::string& filename) {
     qDebug() << "Number of faces : " << nbFaces;
     qDebug() << "Number of faces read: " << faces.size();
     qDebug() << "Vertices at indices 0, 10, and 50:";
-    qDebug() << "Index 0:" << vertices[0].x << vertices[0].y << vertices[0].z;
-    qDebug() << "Index 0:" << colors[0].r <<colors[0].g <<colors[0].b;
-    qDebug() << "Index 0:" << normals[0].nx <<normals[0].ny <<normals[0].nz;
-    qDebug() << "Index 0:" << vertices[0].x << vertices[0].y << vertices[0].z;
-    qDebug() << "Index 10:" << vertices[10].x << vertices[10].y << vertices[10].z;
-    qDebug() << "Index 50:" << vertices[50].x << vertices[50].y << vertices[50].z;
 
     qDebug() << "File loaded successfully: " << QString::fromStdString(filename);
 

@@ -33,10 +33,10 @@ public:
     void drawPlyGeometry(QOpenGLShaderProgram *program);
 
 private:
-    std::vector<PlyVertex> vertices;
-    std::vector<PlyFace> faces;
-    std::vector<PlyColor> colors;
-    std::vector<PlyNormal> normals;
+    QVector<QVector3D> vertices;
+    QVector<QVector3D> faces;
+    QVector<QVector3D> colors;
+    QVector<QVector3D> normals;
 
     QOpenGLBuffer arrayBuf;
     QOpenGLBuffer indexBuf;
