@@ -10,12 +10,10 @@
 
 struct PlyVertex {
     float x, y, z;
-    // Autres propriétés nécessaires pour les vertices
 };
 
 struct PlyFace {
     int vertexIndex1, vertexIndex2, vertexIndex3;
-    // Autres propriétés nécessaires pour les faces
 };
 
 class loadPLY {
@@ -33,7 +31,6 @@ private:
     QOpenGLBuffer arrayBuf;
     QOpenGLBuffer indexBuf;
 
-    // Autres membres nécessaires pour gérer les données du fichier PLY
 };
 
 #endif // LOADPLY_H
