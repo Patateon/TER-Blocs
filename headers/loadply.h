@@ -16,6 +16,14 @@ struct PlyFace {
     int vertexIndex1, vertexIndex2, vertexIndex3;
 };
 
+struct PlyNormal {
+    float nx, ny, nz;
+};
+
+struct PlyColor {
+    int r,g, b;
+};
+
 class loadPLY {
 public:
     loadPLY();
@@ -27,6 +35,8 @@ public:
 private:
     std::vector<PlyVertex> vertices;
     std::vector<PlyFace> faces;
+    std::vector<PlyColor> colors;
+    std::vector<PlyNormal> normals;
 
     QOpenGLBuffer arrayBuf;
     QOpenGLBuffer indexBuf;

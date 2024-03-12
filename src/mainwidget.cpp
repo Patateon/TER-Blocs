@@ -74,7 +74,8 @@ void MainWidget::initializeGL()
 
     //geometries = new GeometryEngine;
     ply= new loadPLY();
-    ply->loadPlyFile("/home/deroubaix/QT_projet/TER-Blocs/data/meshcolor.ply");
+    ply->loadPlyFile("C:\\Users\\Thomas\\Desktop\\image set\\meshcolor.ply");
+
 
     // Use QBasicTimer because its faster than QTimer
     timer.start(12, this);
