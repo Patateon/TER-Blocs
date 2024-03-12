@@ -34,8 +34,8 @@ void loadPLY::loadPlyFile(const std::string& filename) {
         {
             std::istringstream iss(line);
             std::string keyword;
-
-            iss >> keyword;
+            if(isReadingVertices==false)
+                iss >> keyword;
 
             if (keyword == "end_header")
             {
@@ -59,8 +59,7 @@ void loadPLY::loadPlyFile(const std::string& filename) {
                 PlyVertex vertex;
 
                 // Assuming the format is "x y z"
-                vertex.x=std::stod(keyword);
-                iss >> vertex.y >> vertex.z;
+                iss >>vertex.x>> vertex.y >> vertex.z;
                 vertices.push_back(vertex);
             }
             else if (isReadingFaces)
