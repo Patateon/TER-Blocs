@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
 
 #include "../headers/mainwidget.h"
-
+#include "../headers/loadply.h"
 #include <QMouseEvent>
 
 #include <cmath>
@@ -72,7 +72,9 @@ void MainWidget::initializeGL()
     initShaders();
     initTextures();
 
-    geometries = new GeometryEngine;
+    //geometries = new GeometryEngine;
+    ply= new loadPLY();
+    ply->loadPlyFile("/home/deroubaix/QT_projet/TER-Blocs/data/meshcolor.ply");
 
     // Use QBasicTimer because its faster than QTimer
     timer.start(12, this);
@@ -164,5 +166,6 @@ void MainWidget::paintGL()
     //program.setUniformValue("texture", 0);
 
     // Draw cube geometry
-    geometries->drawCubeGeometry(&program);
+    //geometries->drawCubeGeometry(&program);
+    ply->drawPlyGeometry(&program);
 }

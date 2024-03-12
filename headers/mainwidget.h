@@ -5,6 +5,8 @@
 #define MAINWIDGET_H
 
 #include "geometryengine.h"
+#include "loadply.h"
+
 
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
@@ -41,6 +43,8 @@ private:
     QBasicTimer timer;
     QOpenGLShaderProgram program;
     GeometryEngine *geometries = nullptr;
+
+    loadPLY *ply =nullptr;
 
     QOpenGLTexture *texture = nullptr;
 

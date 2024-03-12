@@ -15,13 +15,15 @@ SOURCES += \
     src/mainwidget.cpp
 
 HEADERS += \
-    ../../loadply.h \
-    headers/geometryengine.h \
     headers/loadply.h \
+    headers/geometryengine.h \
     headers/mainwidget.h \
-    src/loadply.h
 
 RESOURCES += \
     shaders/fshader.glsl \
-    shaders/vshader.glsl
-LIBS += -lopengl32
+    shaders/vshader.glsl \
+    data/sphere.ply \
+    data/meshcolor.ply \
+
+win32: LIBS += -lopengl32
+unix: LIBS += -lGL
