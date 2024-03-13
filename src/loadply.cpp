@@ -64,7 +64,7 @@ void loadPLY::loadPlyFile(const std::string& filename) {
         else if (isReadingVertices&&count_vertex<nbVertices)
         {
             float x,y,z;
-            int r,g,b;
+            float r,g,b;
             float nx,ny,nz;
             // Assuming the format is "x y z"
             //vertex.x=std::stod(keyword);
@@ -72,7 +72,7 @@ void loadPLY::loadPlyFile(const std::string& filename) {
             iss >>r>> g >> b;
             iss >>nx>> ny >> nz;
             vertices.append(QVector3D(x,y,z));
-            colors.append(QVector3D(r,g,b));
+            colors.append(QVector3D(r/255.0f,g/255.0f,b/255.0f));
             normals.append(QVector3D(nx,ny,nz));
             count_vertex++;
         }
@@ -116,7 +116,6 @@ void loadPLY::loadPlyFile(const std::string& filename) {
     indexBuf.bind();
     indexBuf.allocate(faces.data(), faces.size() * sizeof(unsigned int));
 
-    colorBuf.create();
     colorBuf.bind();
     colorBuf.allocate(colors.data(), colors.size() * sizeof(QVector3D));
 

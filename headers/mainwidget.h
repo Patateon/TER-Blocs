@@ -31,6 +31,18 @@ protected:
     void mousePressEvent(QMouseEvent *e) override;
     void mouseReleaseEvent(QMouseEvent *e) override;
     void timerEvent(QTimerEvent *e) override;
+    void moveCameraUp();
+    void moveCameraDown();
+    void moveCameraRight();
+    void moveCameraLeft();
+    void keyReleaseEvent(QKeyEvent *event);
+    void keyPressEvent(QKeyEvent *event);
+    void rotateCameraLeft();
+    void rotateCameraRight();
+    void rotateCameraUp();
+    void rotateCameraDown();
+    void zoomIn();
+    void zoomOut();
 
     void initializeGL() override;
     void resizeGL(int w, int h) override;

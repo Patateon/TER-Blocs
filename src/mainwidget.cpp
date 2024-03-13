@@ -43,6 +43,129 @@ void MainWidget::mouseReleaseEvent(QMouseEvent *e)
     // Increase angular speed
     angularSpeed += acc;
 }
+
+void MainWidget::keyPressEvent(QKeyEvent *event)
+{
+    switch (event->key()) {
+    case Qt::Key_Left:
+        moveCameraLeft();
+        break;
+    case Qt::Key_Right:
+        moveCameraRight();
+        break;
+    case Qt::Key_Up:
+        moveCameraUp();
+        break;
+    case Qt::Key_Down:
+        moveCameraDown();
+        break;
+    case Qt::Key_S:
+        rotateCameraDown();
+        break;
+    case Qt::Key_Z:
+        rotateCameraUp();
+        break;
+    case Qt::Key_Q:
+        rotateCameraLeft();
+        break;
+    case Qt::Key_D:
+        rotateCameraRight();
+        break;
+    case Qt::Key_V:
+        zoomIn();
+        break;
+    case Qt::Key_B:
+        zoomOut();
+        break;
+    default:
+        QOpenGLWidget::keyPressEvent(event);
+    }
+}
+
+void MainWidget::keyReleaseEvent(QKeyEvent *event)
+{
+    QOpenGLWidget::keyReleaseEvent(event);
+}
+
+void MainWidget::moveCameraLeft()
+{
+    QVector3D translation(-0.1, 0.0, 0.0);
+    projection.translate(translation);
+    update();
+}
+
+void MainWidget::moveCameraRight()
+{
+    QVector3D translation(0.1, 0.0, 0.0);
+    projection.translate(translation);
+    update();
+}
+
+void MainWidget::moveCameraUp()
+{
+    QVector3D translation(0.0, 0.1, 0.0);
+    projection.translate(translation);
+    update();
+}
+
+void MainWidget::moveCameraDown()
+{
+    QVector3D translation(0.0, 0.0, 0.0);
+    projection.translate(translation);
+    update();
+}
+void MainWidget::rotateCameraLeft()
+{
+    QVector3D translation(0.0, 0.0, 0.0);
+    rotation = QQuaternion::fromAxisAndAngle(QVector3D(0, 1, 0), 5) * rotation;
+    translation = rotation * translation;
+    projection.translate(translation);
+    update();
+}
+
+void MainWidget::rotateCameraRight()
+{
+    QVector3D translation(0.0, 0.0, 0.0);
+    rotation = QQuaternion::fromAxisAndAngle(QVector3D(0, 1, 0), -5) * rotation;
+    translation = rotation * translation;
+    projection.translate(translation);
+    update();
+}
+
+void MainWidget::rotateCameraUp()
+{
+    // Déplacer la caméra vers le haut
+    QVector3D translation(0.0, 0.0, 0.0);
+    rotation = QQuaternion::fromAxisAndAngle(QVector3D(1, 0, 0), -5) * rotation;
+    translation = rotation * translation;
+    projection.translate(translation);
+    update();
+}
+
+void MainWidget::rotateCameraDown()
+{
+    QVector3D translation(0.0, -0.1, 0.0);
+    rotation = QQuaternion::fromAxisAndAngle(QVector3D(1, 0, 0), 5) * rotation;
+    translation = rotation * translation;
+    projection.translate(translation);
+    update();
+}
+
+void MainWidget::zoomIn()
+{
+    QVector3D translation(0.0, 0.0, 0.1);
+    translation = rotation * translation;
+    projection.translate(translation);
+    update();
+}
+
+void MainWidget::zoomOut()
+{
+    QVector3D translation(0.0, 0.0,- 0.1);
+    translation = rotation * translation;
+    projection.translate(translation);
+    update();
+}
 //! [0]
 
 //! [1]
@@ -135,7 +258,7 @@ void MainWidget::resizeGL(int w, int h)
     qreal aspect = qreal(w) / qreal(h ? h : 1);
 
     // Set near plane to 3.0, far plane to 7.0, field of view 45 degrees
-    const qreal zNear = 3.0, zFar = 7.0, fov = 45.0;
+    const qreal zNear = 1.0, zFar = 7.0, fov = 45.0;
 
     // Reset projection
     projection.setToIdentity();
@@ -152,10 +275,10 @@ void MainWidget::paintGL()
 
     //! [2]
     // Enable depth buffer
-    glEnable(GL_DEPTH_TEST);
+    //glEnable(GL_DEPTH_TEST);
 
     // Enable back face culling
-    glEnable(GL_CULL_FACE);
+    //glEnable(GL_CULL_FACE);
     //! [2]
 
     texture->bind();
@@ -164,7 +287,7 @@ void MainWidget::paintGL()
     //! [6]
     // Calculate model view transformation
     QMatrix4x4 matrix;
-    matrix.translate(0.0, 0.0, -5.0);
+    matrix.translate(0.0, 0.0, -8.0);
     matrix.rotate(rotation);
 
     // Set modelview-projection matrix
