@@ -4,6 +4,7 @@
 #include "../headers/mainwidget.h"
 #include "../headers/loadply.h"
 #include <QMouseEvent>
+#include <QFileDialog>
 
 #include <cmath>
 
@@ -72,9 +73,16 @@ void MainWidget::initializeGL()
     initShaders();
     initTextures();
 
-    //geometries = new GeometryEngine;
-    ply= new loadPLY();
-    ply->loadPlyFile("C:\\Users\\Thomas\\Desktop\\image set\\meshcolor.ply");
+    // Ask user to select a PLY file
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open PLY File"), "", tr("PLY Files (*.ply)"));
+    if(fileName.isNull()) {
+        qDebug() << "No file selected. Exiting initialization.";
+        return;
+    }
+
+    // Load the selected PLY file
+    ply = new loadPLY();
+    ply->loadPlyFile(fileName.toStdString());
 
 
     // Use QBasicTimer because its faster than QTimer
