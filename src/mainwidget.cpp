@@ -27,21 +27,6 @@ void MainWidget::mousePressEvent(QMouseEvent *e)
 
 void MainWidget::mouseReleaseEvent(QMouseEvent *e)
 {
-    // Mouse release position - mouse press position
-    QVector2D diff = QVector2D(e->position()) - mousePressPosition;
-
-    // Rotation axis is perpendicular to the mouse position difference
-    // vector
-    QVector3D n = QVector3D(diff.y(), diff.x(), 0.0).normalized();
-
-    // Accelerate angular speed relative to the length of the mouse sweep
-    qreal acc = diff.length() / 100.0;
-
-    // Calculate new rotation axis as weighted sum
-    rotationAxis = (rotationAxis * angularSpeed + n * acc).normalized();
-
-    // Increase angular speed
-    angularSpeed += acc;
 }
 
 void MainWidget::keyPressEvent(QKeyEvent *event)
@@ -110,7 +95,7 @@ void MainWidget::moveCameraUp()
 
 void MainWidget::moveCameraDown()
 {
-    QVector3D translation(0.0, 0.0, 0.0);
+    QVector3D translation(0.0, -0.1, 0.0);
     projection.translate(translation);
     update();
 }
@@ -144,7 +129,7 @@ void MainWidget::rotateCameraUp()
 
 void MainWidget::rotateCameraDown()
 {
-    QVector3D translation(0.0, -0.1, 0.0);
+    QVector3D translation(0.0, 0.0, 0.0);
     rotation = QQuaternion::fromAxisAndAngle(QVector3D(1, 0, 0), 5) * rotation;
     translation = rotation * translation;
     projection.translate(translation);

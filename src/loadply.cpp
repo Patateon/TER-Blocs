@@ -138,7 +138,7 @@ void loadPLY::loadPlyFile(const std::string& filename) {
     indexBuf.bind();
     indexBuf.allocate(faces.data(), faces.size() * sizeof(unsigned int));
 
-    colorBuf.create();
+
     colorBuf.bind();
     colorBuf.allocate(colors.data(), colors.size() * sizeof(QVector3D));
 
