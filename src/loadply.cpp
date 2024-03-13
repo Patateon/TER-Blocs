@@ -11,6 +11,10 @@
 #include <iostream>
 
 loadPLY::loadPLY() {
+    arrayBuf.create();
+    indexBuf.create();
+    colorBuf.create();
+    normalBuf.create();
 }
 
 void loadPLY::loadPlyFile(const std::string& filename) {
@@ -104,11 +108,11 @@ void loadPLY::loadPlyFile(const std::string& filename) {
     qDebug() << faces[1];
     qDebug() << "File loaded successfully: " << QString::fromStdString(filename);
 
-    arrayBuf.create();
+
     arrayBuf.bind();
     arrayBuf.allocate(vertices.data(), vertices.size() * sizeof(QVector3D));
 
-    indexBuf.create();
+
     indexBuf.bind();
     indexBuf.allocate(faces.data(), faces.size() * sizeof(unsigned int));
 
@@ -116,35 +120,34 @@ void loadPLY::loadPlyFile(const std::string& filename) {
     colorBuf.bind();
     colorBuf.allocate(colors.data(), colors.size() * sizeof(QVector3D));
 
-    normalBuf.create();
+
     normalBuf.bind();
     normalBuf.allocate(normals.data(), normals.size() * sizeof(QVector3D));
 
 }
 
 void loadPLY::drawPlyGeometry(QOpenGLShaderProgram *program) {
-    arrayBuf.bind();
-    indexBuf.bind();
-    colorBuf.bind();
-    normalBuf.bind();
 
     // Activer et lier les données de sommet
+    arrayBuf.bind();
     int vertexLocation = program->attributeLocation("vertex");
     program->enableAttributeArray(vertexLocation);
     program->setAttributeBuffer(vertexLocation, GL_FLOAT, 0, 3, sizeof(QVector3D));
 
     // Activer et lier les données de couleur
+    colorBuf.bind();
     int colorLocation = program->attributeLocation("color");
     program->enableAttributeArray(colorLocation);
     program->setAttributeBuffer(colorLocation, GL_FLOAT, 0, 3, sizeof(QVector3D));
 
     // Activer et lier les données de normale
+    normalBuf.bind();
     int normalLocation = program->attributeLocation("normal");
     program->enableAttributeArray(normalLocation);
     program->setAttributeBuffer(normalLocation, GL_FLOAT, 0, 3, sizeof(QVector3D));
 
-    qDebug() << "Drawing PLY geometry with " << faces.size()/3 << " faces";
-
+    //qDebug() << "Drawing PLY geometry with " << faces.size()/3 << " faces";
+    indexBuf.bind();
     // Dessiner les éléments
     glDrawElements(GL_TRIANGLES, faces.size(), GL_UNSIGNED_INT, faces.constData());
 
