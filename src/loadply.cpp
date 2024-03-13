@@ -16,7 +16,6 @@ loadPLY::loadPLY() {
     colorBuf.create();
     normalBuf.create();
 }
-
 void loadPLY::loadPlyFile(const std::string& filename) {
 
     std::ifstream file(filename);
@@ -64,7 +63,7 @@ void loadPLY::loadPlyFile(const std::string& filename) {
         else if (isReadingVertices&&count_vertex<nbVertices)
         {
             float x,y,z;
-            float r,g,b;
+            int r,g,b;
             float nx,ny,nz;
             // Assuming the format is "x y z"
             //vertex.x=std::stod(keyword);
@@ -72,7 +71,7 @@ void loadPLY::loadPlyFile(const std::string& filename) {
             iss >>r>> g >> b;
             iss >>nx>> ny >> nz;
             vertices.append(QVector3D(x,y,z));
-            colors.append(QVector3D(r/255.0f,g/255.0f,b/255.0f));
+            colors.append(QVector3D(r/255.0,g/255.0,b/255.0));
             normals.append(QVector3D(nx,ny,nz));
             count_vertex++;
         }
@@ -100,7 +99,7 @@ void loadPLY::loadPlyFile(const std::string& filename) {
     qDebug() << "Number of vertices : " << nbVertices;
     qDebug() << "Number of vertices read: " << vertices.size();
     qDebug() << "Number of faces : " << nbFaces;
-    qDebug() << "Number of faces read: " << faces.size();
+    qDebug() << "Number of faces read: " << faces.size()/3;
     qDebug() << "Vertices at indices 0, 10, and 50:";
     qDebug() << vertices[1];
     qDebug() << colors[1];
@@ -108,7 +107,30 @@ void loadPLY::loadPlyFile(const std::string& filename) {
     qDebug() << faces[1];
     qDebug() << "File loaded successfully: " << QString::fromStdString(filename);
 
+    QVector3D minBound = vertices[0];
+    QVector3D maxBound = vertices[0];
 
+    for (const QVector3D& vertex : vertices) {
+        minBound.setX(qMin(minBound.x(), vertex.x()));
+        minBound.setY(qMin(minBound.y(), vertex.y()));
+        minBound.setZ(qMin(minBound.z(), vertex.z()));
+
+        maxBound.setX(qMax(maxBound.x(), vertex.x()));
+        maxBound.setY(qMax(maxBound.y(), vertex.y()));
+        maxBound.setZ(qMax(maxBound.z(), vertex.z()));
+    }
+
+    // Calculate the scaling factors for each axis
+    QVector3D boundingBoxSize = maxBound - minBound;
+    float scale = 2.0 / std::max({boundingBoxSize.x(), boundingBoxSize.y(), boundingBoxSize.z()});
+
+    // Calculate the translation vector to center the model
+    QVector3D center = 0.5 * (minBound + maxBound);
+
+    // Scale and translate the vertices
+    for (QVector3D& vertex : vertices) {
+        vertex = scale * (vertex - center);
+    }
     arrayBuf.bind();
     arrayBuf.allocate(vertices.data(), vertices.size() * sizeof(QVector3D));
 
@@ -116,6 +138,7 @@ void loadPLY::loadPlyFile(const std::string& filename) {
     indexBuf.bind();
     indexBuf.allocate(faces.data(), faces.size() * sizeof(unsigned int));
 
+    colorBuf.create();
     colorBuf.bind();
     colorBuf.allocate(colors.data(), colors.size() * sizeof(QVector3D));
 
@@ -124,6 +147,7 @@ void loadPLY::loadPlyFile(const std::string& filename) {
     normalBuf.allocate(normals.data(), normals.size() * sizeof(QVector3D));
 
 }
+
 
 void loadPLY::drawPlyGeometry(QOpenGLShaderProgram *program) {
 
