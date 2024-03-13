@@ -82,9 +82,11 @@ void loadPLY::loadPlyFile(const std::string& filename) {
             // Assuming triangular faces, read and store indices in a new PlyFace
             if (faceVertices == 3)
             {
-                int i0,i1,i2;
+                unsigned int i0,i1,i2;
                 iss >> i0 >> i1 >> i2;
-                faces.append(QVector3D(i0,i1,i2));
+                faces.append(i0);
+                faces.append(i1);
+                faces.append(i2);
             }
         }
 
@@ -96,7 +98,10 @@ void loadPLY::loadPlyFile(const std::string& filename) {
     qDebug() << "Number of faces : " << nbFaces;
     qDebug() << "Number of faces read: " << faces.size();
     qDebug() << "Vertices at indices 0, 10, and 50:";
-    qDebug() << vertices[0];
+    qDebug() << vertices[1];
+    qDebug() << colors[1];
+    qDebug() << normals[1];
+    qDebug() << faces[1];
     qDebug() << "File loaded successfully: " << QString::fromStdString(filename);
 
     arrayBuf.create();
@@ -105,12 +110,23 @@ void loadPLY::loadPlyFile(const std::string& filename) {
 
     indexBuf.create();
     indexBuf.bind();
-    indexBuf.allocate(faces.data(), faces.size() * sizeof(QVector3D));
+    indexBuf.allocate(faces.data(), faces.size() * sizeof(unsigned int));
+
+    colorBuf.create();
+    colorBuf.bind();
+    colorBuf.allocate(colors.data(), colors.size() * sizeof(QVector3D));
+
+    normalBuf.create();
+    normalBuf.bind();
+    normalBuf.allocate(normals.data(), normals.size() * sizeof(QVector3D));
+
 }
 
 void loadPLY::drawPlyGeometry(QOpenGLShaderProgram *program) {
     arrayBuf.bind();
     indexBuf.bind();
+    colorBuf.bind();
+    normalBuf.bind();
 
     // Activer et lier les données de sommet
     int vertexLocation = program->attributeLocation("vertex");
@@ -120,17 +136,17 @@ void loadPLY::drawPlyGeometry(QOpenGLShaderProgram *program) {
     // Activer et lier les données de couleur
     int colorLocation = program->attributeLocation("color");
     program->enableAttributeArray(colorLocation);
-    program->setAttributeBuffer(colorLocation, GL_FLOAT, sizeof(QVector3D), 3, sizeof(QVector3D));
+    program->setAttributeBuffer(colorLocation, GL_FLOAT, 0, 3, sizeof(QVector3D));
 
     // Activer et lier les données de normale
     int normalLocation = program->attributeLocation("normal");
     program->enableAttributeArray(normalLocation);
-    program->setAttributeBuffer(normalLocation, GL_FLOAT, 2 * sizeof(QVector3D), 3, sizeof(QVector3D));
+    program->setAttributeBuffer(normalLocation, GL_FLOAT, 0, 3, sizeof(QVector3D));
 
-    qDebug() << "Drawing PLY geometry with " << faces.size() << " faces";
+    qDebug() << "Drawing PLY geometry with " << faces.size()/3 << " faces";
 
     // Dessiner les éléments
-    glDrawElements(GL_TRIANGLES, faces.size() * 3, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, faces.size(), GL_UNSIGNED_INT, faces.constData());
 
     // Désactiver les attributs
     program->disableAttributeArray(vertexLocation);
