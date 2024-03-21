@@ -29,6 +29,15 @@ QVector<QVector3D>& Mesh::getColors() {
 QVector<QVector3D>& Mesh::getNormals() {
     return normals;
 }
+void Mesh::buildKdtree(){
+    /*
+    vector<Vec3> verticesVectorVec3;
+    for(const QVector3D& vertex : vertices){
+        Vec3 v(vertex.x(),vertex.y(),vertex.z());
+        verticesVectorVec3.push_back(v);
+    }
+    kdtree.build(verticesVectorVec3);*/
+}
 
 void Mesh::bindAndAllocateBuffer(){
     arrayBuf.bind();

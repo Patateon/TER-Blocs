@@ -4,9 +4,7 @@
 #ifndef MAINWIDGET_H
 #define MAINWIDGET_H
 
-#include "geometryengine.h"
 #include "plyFile.h"
-#include "mesh.h"
 
 
 #include <QOpenGLWidget>
@@ -58,7 +56,7 @@ private:
     GeometryEngine *geometries = nullptr;
 
     PlyFile *ply =nullptr;
-    Mesh * mesh =nullptr;
+    Mesh *mesh;
 
     QOpenGLTexture *texture = nullptr;
 

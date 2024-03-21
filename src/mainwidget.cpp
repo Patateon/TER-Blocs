@@ -9,7 +9,6 @@ MainWidget::~MainWidget()
     // and the buffers.
     makeCurrent();
     delete texture;
-    delete geometries;
     doneCurrent();
 }
 

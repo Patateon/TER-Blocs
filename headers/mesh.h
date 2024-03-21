@@ -1,9 +1,15 @@
 #ifndef MESH_H
 #define MESH_H
 
-#include <string>
+#include "kdtree.h"
+#include "Vec3.h"
+
+
+#include <vector>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLBuffer>
+
+using namespace std;
 
 class Mesh
 {
@@ -20,8 +26,11 @@ public:
     QVector<QVector3D>& getColors();
     QVector<QVector3D>& getNormals();
     void bindAndAllocateBuffer();
+    void buildKdtree();
 
 private:
+    BasicANNkdTree kdtree;
+
     QVector<QVector3D> vertices;
     QVector<QVector3D> colors;
     QVector<QVector3D> normals;
