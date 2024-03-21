@@ -20,15 +20,14 @@ public:
 
 private:
     QVector<QVector3D> vertices;
-    QVector<unsigned int> faces;
     QVector<QVector3D> colors;
     QVector<QVector3D> normals;
 
     QOpenGLBuffer arrayBuf;
-    QOpenGLBuffer indexBuf;
     QOpenGLBuffer colorBuf;
     QOpenGLBuffer normalBuf;
 
 };
+
 
 #endif // LOADPLY_H
