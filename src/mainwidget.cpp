@@ -2,11 +2,6 @@
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
 
 #include "../headers/mainwidget.h"
-#include "../headers/loadply.h"
-#include <QMouseEvent>
-#include <QFileDialog>
-
-#include <cmath>
 
 MainWidget::~MainWidget()
 {
@@ -189,8 +184,9 @@ void MainWidget::initializeGL()
     }
 
     // Load the selected PLY file
-    ply = new loadPLY();
-    ply->loadPlyFile(fileName.toStdString());
+    mesh = new Mesh();
+    ply = new PlyFile();
+    ply->loadPlyFile(fileName.toStdString(), mesh);
 
 
     // Use QBasicTimer because its faster than QTimer
@@ -284,5 +280,5 @@ void MainWidget::paintGL()
 
     // Draw cube geometry
     //geometries->drawCubeGeometry(&program);
-    ply->drawPlyGeometry(&program);
+    mesh->drawGeometry(&program);
 }

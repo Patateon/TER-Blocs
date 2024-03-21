@@ -1,4 +1,4 @@
-#include "../headers/loadply.h"
+#include "../headers/plyFile.h"
 
 #include <fstream>
 #include <string>
@@ -9,13 +9,9 @@
 #include <QOpenGLBuffer>
 #include <iostream>
 
-loadPLY::loadPLY() {
-    arrayBuf.create();
-    colorBuf.create();
-    normalBuf.create();
-}
+PlyFile::PlyFile(){}
 
-void loadPLY::loadPlyFile(const std::string& filename) {
+void PlyFile::loadPlyFile(const std::string& filename, Mesh *mesh) {
 
     std::ifstream file(filename);
 
@@ -64,14 +60,16 @@ void loadPLY::loadPlyFile(const std::string& filename) {
             iss >>x>>y >> z;
             iss >>r>> g >> b;
             iss >>nx>> ny >> nz;
-            vertices.append(QVector3D(x,y,z));
-            colors.append(QVector3D(r/255.0f,g/255.0f,b/255.0f));
-            normals.append(QVector3D(nx,ny,nz));
+            mesh->addVertices(QVector3D(x,y,z));
+            mesh->addColors(QVector3D(r/255.0f,g/255.0f,b/255.0f));
+            mesh->addNormals(QVector3D(nx,ny,nz));
             count_vertex++;
         }
     }
     file.close();  // Close the file
-
+    QVector<QVector3D> vertices=mesh->getVertices();
+    QVector<QVector3D> colors=mesh->getColors();
+    QVector<QVector3D> normals=mesh->getNormals();
     qDebug() << "Number of vertices : " << nbVertices;
     qDebug() << "Number of vertices read: " << vertices.size();
     qDebug() << "Vertices at indices 0, 10, and 50:";
@@ -105,41 +103,45 @@ void loadPLY::loadPlyFile(const std::string& filename) {
         vertex = scale * (vertex - center);
     }
 
+    mesh->bindAndAllocateBuffer();
+  }
 
-    arrayBuf.bind();
-    arrayBuf.allocate(vertices.data(), vertices.size() * sizeof(QVector3D));
-    colorBuf.bind();
-    colorBuf.allocate(colors.data(), colors.size() * sizeof(QVector3D));
-    normalBuf.bind();
-    normalBuf.allocate(normals.data(), normals.size() * sizeof(QVector3D));
+void PlyFile::writePlyFile(const std::string& filename, Mesh* mesh) {
+    std::ofstream file(filename);
+    if (!file.is_open()) {
+        qDebug() << "Failed to open .ply file for writing";
+        return;
+    }
+    QVector<QVector3D> vertices=mesh->getVertices();
+    QVector<QVector3D> colors=mesh->getColors();
+    QVector<QVector3D> normals=mesh->getNormals();
+    // Write PLY header
+    file << "ply\n";
+    file << "format ascii 1.0\n";
+    file << "element vertex " << vertices.size() << "\n";
+    file << "property float x\n";
+    file << "property float y\n";
+    file << "property float z\n";
+    file << "property uchar red\n";
+    file << "property uchar green\n";
+    file << "property uchar blue\n";
+    file << "property float nx\n";
+    file << "property float ny\n";
+    file << "property float nz\n";
+    file << "end_header\n";
 
+    // Write vertex data
+    for (int i = 0; i < vertices.size(); ++i) {
+        const QVector3D& vertex = vertices[i];
+        const QVector3D& color = colors[i];
+        const QVector3D& normal = normals[i];
+        file << vertex.x() << " " << vertex.y() << " " << vertex.z() << " ";
+        file << static_cast<int>(color.x()) << " " << static_cast<int>(color.y()) << " " << static_cast<int>(color.z()) << " ";
+        file << normal.x() << " " << normal.y() << " " << normal.z() << "\n";
+    }
+
+    file.close();
+    qDebug() << "PLY file written successfully: " << QString::fromStdString(filename);
 }
-
-void loadPLY::drawPlyGeometry(QOpenGLShaderProgram *program) {
-
-    arrayBuf.bind();
-    int vertexLocation = program->attributeLocation("vertex");
-    program->enableAttributeArray(vertexLocation);
-    program->setAttributeBuffer(vertexLocation, GL_FLOAT, 0, 3, sizeof(QVector3D));
-
-    colorBuf.bind();
-    int colorLocation = program->attributeLocation("color");
-    program->enableAttributeArray(colorLocation);
-    program->setAttributeBuffer(colorLocation, GL_FLOAT, 0, 3, sizeof(QVector3D));
-
-    normalBuf.bind();
-    int normalLocation = program->attributeLocation("normal");
-    program->enableAttributeArray(normalLocation);
-    program->setAttributeBuffer(normalLocation, GL_FLOAT, 0, 3, sizeof(QVector3D));
-
-    glDrawArrays(GL_POINTS, 0, vertices.size());
-
-    // Désactiver les attributs
-    program->disableAttributeArray(vertexLocation);
-    program->disableAttributeArray(colorLocation);
-    program->disableAttributeArray(normalLocation);
-}
-
-
 
 

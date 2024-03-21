@@ -5,7 +5,8 @@
 #define MAINWIDGET_H
 
 #include "geometryengine.h"
-#include "loadply.h"
+#include "plyFile.h"
+#include "mesh.h"
 
 
 #include <QOpenGLWidget>
@@ -56,7 +57,8 @@ private:
     QOpenGLShaderProgram program;
     GeometryEngine *geometries = nullptr;
 
-    loadPLY *ply =nullptr;
+    PlyFile *ply =nullptr;
+    Mesh * mesh =nullptr;
 
     QOpenGLTexture *texture = nullptr;
 

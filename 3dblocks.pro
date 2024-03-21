@@ -10,20 +10,23 @@ QT += opengl
 QT += openglwidgets
 SOURCES += \
     src/geometryengine.cpp \
-    src/loadply.cpp \
     src/main.cpp \
-    src/mainwidget.cpp
+    src/mainwidget.cpp \
+    src/mesh.cpp \
+    src/plyFile.cpp
 
 HEADERS += \
-    headers/loadply.h \
     headers/geometryengine.h \
     headers/mainwidget.h \
+    headers/mesh.h \
+    headers/plyFile.h
 
 RESOURCES += \
     shaders/fshader.glsl \
     shaders/vshader.glsl \
-    data/sphere.ply \
     data/meshcolor.ply \
 
+INCLUDEPATH += /usr/include
+
 win32: LIBS += -lopengl32
-unix: LIBS += -lGL
+unix: LIBS += -lGL -lgmp -lmpfr
