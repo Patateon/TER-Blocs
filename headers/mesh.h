@@ -9,8 +9,8 @@
 
 using namespace std;
 
-#define DISTANCE_COULEURS 100.0
-#define DISTANCE_XY 0.1
+#define DISTANCE_COULEURS 110.0
+#define DISTANCE_XYZ 0.18
 
 class Mesh
 {

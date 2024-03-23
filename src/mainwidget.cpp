@@ -309,17 +309,23 @@ void MainWidget::saveCurrentMesh(){
 }
 
 void MainWidget::deleteCurrentMesh(){
-    allMesh.removeAt(nextMeshIndice-1);
-    currentMesh = allMesh[nextMeshIndice-1];
-    currentMesh->bindAndAllocateBuffer();
+    delete allMesh[nextMeshIndice - 1];
+    allMesh.removeAt(nextMeshIndice - 1);
+    if (!allMesh.isEmpty()) {
+        currentMesh = allMesh[nextMeshIndice - 1];
+        currentMesh->bindAndAllocateBuffer();
+        update();
+    } else {
+        currentMesh = nullptr;
+    }
 }
-
 
 void MainWidget::switchMesh(){
     if( nextMeshIndice >= allMesh.size() ) { nextMeshIndice = 0 ; }
     currentMesh = allMesh[nextMeshIndice];
     currentMesh->bindAndAllocateBuffer();
     nextMeshIndice++;
+    update();
 }
 
 void MainWidget::parseMesh(){
