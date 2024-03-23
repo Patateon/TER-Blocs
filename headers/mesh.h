@@ -2,15 +2,14 @@
 #define MESH_H
 
 #include "kdtree.h"
-#include "Vec3.h"
 #include <vector>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLBuffer>
 
 using namespace std;
 
-#define DISTANCE_COULEURS 100.0
-#define DISTANCE_XY 0.1
+#define DISTANCE_COULEURS 120.0
+#define DISTANCE_XY 0.14
 
 class Mesh
 {

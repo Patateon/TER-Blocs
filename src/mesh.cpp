@@ -10,6 +10,11 @@ Mesh::Mesh() {
     colorBuf.create();
     normalBuf.create();
 }
+Mesh::~Mesh() {
+    arrayBuf.destroy();
+    colorBuf.destroy();
+    normalBuf.destroy();
+}
 
 void Mesh::addVertices(QVector3D vertice){
     vertices.append(vertice);
@@ -50,19 +55,24 @@ QVector<Mesh *> Mesh::parseMesh() {
         for(int i = 0; i < c.size(); i++ ) {
             float distancePointX=euclidean_distance(sMeshVertices[0].x() , v[i].x());
             float distancePointY=euclidean_distance(sMeshVertices[0].y() , v[i].y());
+            float distancePointZ=euclidean_distance(sMeshVertices[0].z() , v[i].z());
             float distanceRouge=euclidean_distance(sMeshColors[0].x()*255 , c[i].x()*255);
             float distanceVert=euclidean_distance(sMeshColors[0].y()*255 , c[i].y()*255);
             float distanceBleu=euclidean_distance(sMeshColors[0].z()*255 , c[i].z()*255);
-            if(distancePointX + distancePointY < DISTANCE_XY && distanceRouge + distanceVert + distanceBleu < DISTANCE_COULEURS ) {
+            if(distancePointX + distancePointY+distancePointZ < DISTANCE_XY && distanceRouge + distanceVert + distanceBleu < DISTANCE_COULEURS ) {
                 sousMesh->addVertices( v[i] ); v.removeAt(i);
                 sousMesh->addColors( c[i] ); c.removeAt(i);
                 sousMesh->addNormals( n[i] ); n.removeAt(i);
                 i--;
             }
         }
-        if( sousMesh->getVertices().size() > 1500) {
+        if( sousMesh->getVertices().size() > 800) {
             allMesh.append(sousMesh);
             qDebug() << "Sous mesh n: " << allMesh.size() << "de taille : " << allMesh[allMesh.size()-1]->getVertices().size();
+        }
+        else {
+            delete sousMesh;
+            sousMesh = nullptr;
         }
     }
     qDebug() << "Nombre de sous mesh par couleur " << allMesh.size();

@@ -19,7 +19,6 @@ HEADERS += \
     headers/mainwidget.h \
     headers/mesh.h \
     headers/plyFile.h \
-    headers/Vec3.h\
     ANN/ANN.h \
 
 RESOURCES += \
