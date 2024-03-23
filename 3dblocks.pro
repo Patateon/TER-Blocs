@@ -20,9 +20,6 @@ HEADERS += \
     headers/mainwidget.h \
     headers/mesh.h \
     headers/plyFile.h \
-    headers/Vec3.h\
-    ANN/ANN.h
-
 
 RESOURCES += \
     shaders/fshader.glsl \
@@ -30,11 +27,13 @@ RESOURCES += \
     data/meshcolor.ply \
 
 INCLUDEPATH += /usr/include
-INCLUDEPATH += $$PWD/ann/include
 
 win32: LIBS += -lopengl32
 unix: LIBS += -lGL -lgmp -lmpfr
 
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/external/release/ -lANN
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/external/debug/ -lANN
+else:unix: LIBS += -L$$PWD/external/ -lANN
 
-
-
+INCLUDEPATH += $$PWD/external/ann_1.1.2_MS_Win32_bin
+DEPENDPATH += $$PWD/external/ann_1.1.2_MS_Win32_bin

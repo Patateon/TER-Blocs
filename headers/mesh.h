@@ -2,7 +2,6 @@
 #define MESH_H
 
 #include "kdtree.h"
-#include "Vec3.h"
 
 
 #include <vector>
