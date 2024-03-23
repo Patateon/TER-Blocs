@@ -136,7 +136,7 @@ void PlyFile::writePlyFile(const std::string& filename, Mesh* mesh) {
         const QVector3D& color = colors[i];
         const QVector3D& normal = normals[i];
         file << vertex.x() << " " << vertex.y() << " " << vertex.z() << " ";
-        file << static_cast<int>(color.x()) << " " << static_cast<int>(color.y()) << " " << static_cast<int>(color.z()) << " ";
+        file << static_cast<int>(color.x()*255) << " " << static_cast<int>(color.y()*255) << " " << static_cast<int>(color.z()*255) << " ";
         file << normal.x() << " " << normal.y() << " " << normal.z() << "\n";
     }
 

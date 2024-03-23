@@ -30,7 +30,7 @@ QVector<QVector3D>& Mesh::getNormals() {
     return normals;
 }
 void Mesh::buildKdtree(){
-    /*
+/*
     vector<Vec3> verticesVectorVec3;
     for(const QVector3D& vertex : vertices){
         Vec3 v(vertex.x(),vertex.y(),vertex.z());

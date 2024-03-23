@@ -56,6 +56,8 @@ void MainWidget::keyPressEvent(QKeyEvent *event)
     case Qt::Key_B:
         zoomOut();
         break;
+    case Qt::Key_O:
+        saveCurrentMesh();
     default:
         QOpenGLWidget::keyPressEvent(event);
     }
@@ -184,8 +186,10 @@ void MainWidget::initializeGL()
 
     // Load the selected PLY file
     mesh = new Mesh();
+    allMesh.append(mesh);
+    currentMesh=mesh;
     ply = new PlyFile();
-    ply->loadPlyFile(fileName.toStdString(), mesh);
+    ply->loadPlyFile(fileName.toStdString(), currentMesh);
 
 
     // Use QBasicTimer because its faster than QTimer
@@ -279,5 +283,14 @@ void MainWidget::paintGL()
 
     // Draw cube geometry
     //geometries->drawCubeGeometry(&program);
-    mesh->drawGeometry(&program);
+    currentMesh->drawGeometry(&program);
+}
+
+void MainWidget::saveCurrentMesh(){
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save PLY File"), "", tr("PLY Files (*.ply)"));
+    if(fileName.isNull()) {
+        qDebug() << "No file selected. Exiting initialization.";
+        return;
+    }
+    ply->writePlyFile(fileName.toStdString(),currentMesh);
 }

@@ -12,6 +12,7 @@
 #include <QMatrix4x4>
 #include <QQuaternion>
 #include <QVector2D>
+#include <QVector>
 #include <QBasicTimer>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLTexture>
@@ -43,6 +44,8 @@ protected:
     void zoomIn();
     void zoomOut();
 
+    void saveCurrentMesh();
+
     void initializeGL() override;
     void resizeGL(int w, int h) override;
     void paintGL() override;
@@ -56,6 +59,8 @@ private:
     GeometryEngine *geometries = nullptr;
 
     PlyFile *ply =nullptr;
+    QVector<Mesh *> allMesh;
+    Mesh *currentMesh;
     Mesh *mesh;
 
     QOpenGLTexture *texture = nullptr;

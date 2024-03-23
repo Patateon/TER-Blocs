@@ -14,15 +14,13 @@ SOURCES += \
     src/mesh.cpp \
     src/plyFile.cpp \
 
-
 HEADERS += \
     headers/kdtree.h \
     headers/mainwidget.h \
     headers/mesh.h \
     headers/plyFile.h \
     headers/Vec3.h\
-    ANN/ANN.h
-
+    ANN/ANN.h \
 
 RESOURCES += \
     shaders/fshader.glsl \
