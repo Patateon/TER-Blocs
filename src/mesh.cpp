@@ -5,6 +5,58 @@ float euclidean_distance(const float p1, const float p2) {
     return sqrt( dr*dr );
 }
 
+float euclidean_distance(const QVector3D& p1, const QVector3D& p2) {
+    float diffR = p1.x() - p2.x();
+    float diffG = p1.y() - p2.y();
+    float diffB = p1.z() - p2.z();
+    return sqrt(diffR * diffR + diffG * diffG + diffB * diffB);
+}
+
+
+struct QVector3DComparer {
+    bool operator()(const QVector3D& c1, const QVector3D& c2) const {
+        // Compare les coordonnées x, y, et z
+        if (c1.x() != c2.x()) return c1.x() < c2.x();
+        if (c1.y() != c2.y()) return c1.y() < c2.y();
+        return c1.z() < c2.z();
+    }
+};
+
+// Fonction pour trouver la couleur dominante
+QVector3D getDominantColor(const QVector<QVector3D>& couleurs) {
+    // Définir une carte pour compter les occurrences de chaque couleur
+    std::map<QVector3D, int, QVector3DComparer> compteurs;
+
+    // Itérer sur toutes les couleurs et les regrouper
+    for (const QVector3D& couleur : couleurs) {
+        // Vérifier si une couleur similaire est déjà présente dans la carte
+        bool couleurTrouvee = false;
+        for (auto& it : compteurs) {
+            if (euclidean_distance(couleur, it.first) < DISTANCE_COULEURS_DOMINANTE) { // Choisir une distance de seuil appropriée
+                it.second++;
+                couleurTrouvee = true;
+                break;
+            }
+        }
+        // Si la couleur n'a pas été trouvée, l'ajouter à la carte
+        if (!couleurTrouvee) {
+            compteurs[couleur] = 1;
+        }
+    }
+
+    // Trouver la couleur avec le compteur le plus élevé
+    QVector3D couleurDominante;
+    int maxCompteur = 0;
+    for (const auto& it : compteurs) {
+        if (it.second > maxCompteur) {
+            maxCompteur = it.second;
+            couleurDominante = it.first;
+        }
+    }
+
+    return couleurDominante;
+}
+
 Mesh::Mesh() {
     arrayBuf.create();
     colorBuf.create();
@@ -14,6 +66,12 @@ Mesh::~Mesh() {
     arrayBuf.destroy();
     colorBuf.destroy();
     normalBuf.destroy();
+}
+
+Mesh::~Mesh(){
+    vertices.clear();
+    colors.clear();
+    normals.clear();
 }
 
 void Mesh::addVertices(QVector3D vertice){
@@ -53,26 +111,27 @@ QVector<Mesh *> Mesh::parseMesh() {
         QVector<QVector3D> sMeshColors=sousMesh->getColors();
         QVector<QVector3D> sMeshVertices=sousMesh->getVertices();
         for(int i = 0; i < c.size(); i++ ) {
-            float distancePointX=euclidean_distance(sMeshVertices[0].x() , v[i].x());
-            float distancePointY=euclidean_distance(sMeshVertices[0].y() , v[i].y());
-            float distancePointZ=euclidean_distance(sMeshVertices[0].z() , v[i].z());
-            float distanceRouge=euclidean_distance(sMeshColors[0].x()*255 , c[i].x()*255);
-            float distanceVert=euclidean_distance(sMeshColors[0].y()*255 , c[i].y()*255);
-            float distanceBleu=euclidean_distance(sMeshColors[0].z()*255 , c[i].z()*255);
-            if(distancePointX + distancePointY+distancePointZ < DISTANCE_XY && distanceRouge + distanceVert + distanceBleu < DISTANCE_COULEURS ) {
+            float distancePoint=euclidean_distance(sMeshVertices[0], v[i]);
+            /*
+            float distanceRouge=euclidean_distance(sMeshColors[0].x()*256 , c[i].x()*256);
+            float distanceVert=euclidean_distance(sMeshColors[0].y()*256 , c[i].y()*256);
+            float distanceBleu=euclidean_distance(sMeshColors[0].z()*256 , c[i].z()*256);
+            */
+            float distanceCouleur=euclidean_distance(sMeshColors[0], c[i]);
+            //if(distancePoint < DISTANCE_XYZ && distanceRouge + distanceVert + distanceBleu < DISTANCE_COULEURS ) {
+            if(distancePoint < DISTANCE_XYZ && distanceCouleur < DISTANCE_COULEURS/256.0 ) {
                 sousMesh->addVertices( v[i] ); v.removeAt(i);
                 sousMesh->addColors( c[i] ); c.removeAt(i);
                 sousMesh->addNormals( n[i] ); n.removeAt(i);
                 i--;
             }
         }
-        if( sousMesh->getVertices().size() > 800) {
+        if( sousMesh->getVertices().size() > NBPOINTSMIN) {
             allMesh.append(sousMesh);
             qDebug() << "Sous mesh n: " << allMesh.size() << "de taille : " << allMesh[allMesh.size()-1]->getVertices().size();
         }
-        else {
+        else{
             delete sousMesh;
-            sousMesh = nullptr;
         }
     }
     qDebug() << "Nombre de sous mesh par couleur " << allMesh.size();
@@ -80,7 +139,22 @@ QVector<Mesh *> Mesh::parseMesh() {
     return allMesh;
 }
 
-
+void Mesh::clearMesh() {
+    qDebug() << "Nombre de vertices avant nettoyage " << vertices.size();
+    QVector3D dominantColor = getDominantColor(colors);
+    qDebug() << "Couleur dominante " << dominantColor.x()  << dominantColor.y () << dominantColor.z();
+    for(int i=0; i<vertices.size();){
+        float distance = euclidean_distance(dominantColor, colors[i]);
+        if(distance < DISTANCE_COULEURS_DOMINANTE){
+            vertices.removeAt(i);
+            colors.removeAt(i);
+            normals.removeAt(i);
+        } else {
+            i++;
+        }
+    }
+    qDebug() << "Nombre de vertices apres nettoyage " << vertices.size();
+}
 void Mesh::buildKdtree(){
 /*
     vector<Vec3> verticesVectorVec3;

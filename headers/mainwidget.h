@@ -46,6 +46,7 @@ protected:
 
     void saveCurrentMesh();
     void deleteCurrentMesh();
+    void clearCurrentMesh();
     void switchMesh();
     void parseMesh();
 

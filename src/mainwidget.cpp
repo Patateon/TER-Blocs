@@ -76,6 +76,9 @@ void MainWidget::keyReleaseEvent(QKeyEvent *event)
     case Qt::Key_X:
         deleteCurrentMesh();
         break;
+    case Qt::Key_I:
+        clearCurrentMesh();
+        break;
     default:
         QOpenGLWidget::keyReleaseEvent(event);
     }
@@ -309,17 +312,29 @@ void MainWidget::saveCurrentMesh(){
 }
 
 void MainWidget::deleteCurrentMesh(){
-    allMesh.removeAt(nextMeshIndice-1);
-    currentMesh = allMesh[nextMeshIndice-1];
-    currentMesh->bindAndAllocateBuffer();
+    delete allMesh[nextMeshIndice - 1];
+    allMesh.removeAt(nextMeshIndice - 1);
+    if (!allMesh.isEmpty()) {
+        currentMesh = allMesh[nextMeshIndice - 1];
+        currentMesh->bindAndAllocateBuffer();
+        update();
+    } else {
+        currentMesh = nullptr;
+    }
 }
 
+void MainWidget::clearCurrentMesh() {
+    currentMesh->clearMesh();
+    currentMesh->bindAndAllocateBuffer();
+    update();
+}
 
 void MainWidget::switchMesh(){
     if( nextMeshIndice >= allMesh.size() ) { nextMeshIndice = 0 ; }
     currentMesh = allMesh[nextMeshIndice];
     currentMesh->bindAndAllocateBuffer();
     nextMeshIndice++;
+    update();
 }
 
 void MainWidget::parseMesh(){
