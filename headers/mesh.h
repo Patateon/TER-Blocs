@@ -9,8 +9,10 @@
 
 using namespace std;
 
-#define DISTANCE_COULEURS 110.0
-#define DISTANCE_XYZ 0.18
+#define DISTANCE_COULEURS 100.0 // entre 0 et 256
+#define DISTANCE_XYZ 0.25 // entre 0 et 1
+#define NBPOINTSMIN 420
+#define DISTANCE_COULEURS_DOMINANTE 0.15 // entre 0 et 1
 
 class Mesh
 {
@@ -30,6 +32,7 @@ public:
     void buildKdtree();
 
     QVector<Mesh *> parseMesh();
+    void clearMesh();
 
 private:
     BasicANNkdTree kdtree;

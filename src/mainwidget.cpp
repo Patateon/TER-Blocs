@@ -76,6 +76,9 @@ void MainWidget::keyReleaseEvent(QKeyEvent *event)
     case Qt::Key_X:
         deleteCurrentMesh();
         break;
+    case Qt::Key_I:
+        clearCurrentMesh();
+        break;
     default:
         QOpenGLWidget::keyReleaseEvent(event);
     }
@@ -318,6 +321,12 @@ void MainWidget::deleteCurrentMesh(){
     } else {
         currentMesh = nullptr;
     }
+}
+
+void MainWidget::clearCurrentMesh() {
+    currentMesh->clearMesh();
+    currentMesh->bindAndAllocateBuffer();
+    update();
 }
 
 void MainWidget::switchMesh(){

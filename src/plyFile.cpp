@@ -61,7 +61,7 @@ void PlyFile::loadPlyFile(const std::string& filename, Mesh *mesh) {
             iss >>r>> g >> b;
             iss >>nx>> ny >> nz;
             mesh->addVertices(QVector3D(x,y,z));
-            mesh->addColors(QVector3D(r/255.0f,g/255.0f,b/255.0f));
+            mesh->addColors(QVector3D(r/256.0f,g/256.0f,b/256.0f));
             mesh->addNormals(QVector3D(nx,ny,nz));
             count_vertex++;
         }
@@ -136,7 +136,7 @@ void PlyFile::writePlyFile(const std::string& filename, Mesh* mesh) {
         const QVector3D& color = colors[i];
         const QVector3D& normal = normals[i];
         file << vertex.x() << " " << vertex.y() << " " << vertex.z() << " ";
-        file << static_cast<int>(color.x()*255) << " " << static_cast<int>(color.y()*255) << " " << static_cast<int>(color.z()*255) << " ";
+        file << static_cast<int>(color.x()*256) << " " << static_cast<int>(color.y()*256) << " " << static_cast<int>(color.z()*256) << " ";
         file << normal.x() << " " << normal.y() << " " << normal.z() << "\n";
     }
 
