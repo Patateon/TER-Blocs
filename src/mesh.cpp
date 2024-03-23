@@ -68,11 +68,6 @@ Mesh::~Mesh() {
     normalBuf.destroy();
 }
 
-Mesh::~Mesh(){
-    vertices.clear();
-    colors.clear();
-    normals.clear();
-}
 
 void Mesh::addVertices(QVector3D vertice){
     vertices.append(vertice);
