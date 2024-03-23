@@ -3,13 +3,14 @@
 
 #include "kdtree.h"
 #include "Vec3.h"
-
-
 #include <vector>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLBuffer>
 
 using namespace std;
+
+#define DISTANCE_COULEURS 100.0
+#define DISTANCE_XY 0.1
 
 class Mesh
 {
@@ -27,6 +28,8 @@ public:
     QVector<QVector3D>& getNormals();
     void bindAndAllocateBuffer();
     void buildKdtree();
+
+    QVector<Mesh *> parseMesh();
 
 private:
     BasicANNkdTree kdtree;

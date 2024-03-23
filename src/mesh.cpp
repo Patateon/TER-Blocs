@@ -1,5 +1,10 @@
 #include "../headers/mesh.h"
 
+float euclidean_distance(const float p1, const float p2) {
+    float dr = p1 - p2;
+    return sqrt( dr*dr );
+}
+
 Mesh::Mesh() {
     arrayBuf.create();
     colorBuf.create();
@@ -29,6 +34,43 @@ QVector<QVector3D>& Mesh::getColors() {
 QVector<QVector3D>& Mesh::getNormals() {
     return normals;
 }
+
+QVector<Mesh *> Mesh::parseMesh() {
+    QVector<Mesh *> allMesh;
+    QVector<QVector3D> v = vertices;
+    QVector<QVector3D> c = colors;
+    QVector<QVector3D> n = normals;
+    while( !v.isEmpty() ) {
+        Mesh* sousMesh = new Mesh();
+        sousMesh->addVertices( v[0] ); v.removeAt(0);
+        sousMesh->addColors( c[0] ); c.removeAt(0);
+        sousMesh->addNormals( n[0] ); n.removeAt(0);
+        QVector<QVector3D> sMeshColors=sousMesh->getColors();
+        QVector<QVector3D> sMeshVertices=sousMesh->getVertices();
+        for(int i = 0; i < c.size(); i++ ) {
+            float distancePointX=euclidean_distance(sMeshVertices[0].x() , v[i].x());
+            float distancePointY=euclidean_distance(sMeshVertices[0].y() , v[i].y());
+            float distanceRouge=euclidean_distance(sMeshColors[0].x()*255 , c[i].x()*255);
+            float distanceVert=euclidean_distance(sMeshColors[0].y()*255 , c[i].y()*255);
+            float distanceBleu=euclidean_distance(sMeshColors[0].z()*255 , c[i].z()*255);
+            if(distancePointX + distancePointY < DISTANCE_XY && distanceRouge + distanceVert + distanceBleu < DISTANCE_COULEURS ) {
+                sousMesh->addVertices( v[i] ); v.removeAt(i);
+                sousMesh->addColors( c[i] ); c.removeAt(i);
+                sousMesh->addNormals( n[i] ); n.removeAt(i);
+                i--;
+            }
+        }
+        if( sousMesh->getVertices().size() > 1500) {
+            allMesh.append(sousMesh);
+            qDebug() << "Sous mesh n: " << allMesh.size() << "de taille : " << allMesh[allMesh.size()-1]->getVertices().size();
+        }
+    }
+    qDebug() << "Nombre de sous mesh par couleur " << allMesh.size();
+    qDebug() << "Nombre de vertices du premier sous mesh " << allMesh[0]->getVertices().size();
+    return allMesh;
+}
+
+
 void Mesh::buildKdtree(){
 /*
     vector<Vec3> verticesVectorVec3;

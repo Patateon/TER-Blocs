@@ -45,6 +45,9 @@ protected:
     void zoomOut();
 
     void saveCurrentMesh();
+    void deleteCurrentMesh();
+    void switchMesh();
+    void parseMesh();
 
     void initializeGL() override;
     void resizeGL(int w, int h) override;
@@ -60,6 +63,7 @@ private:
 
     PlyFile *ply =nullptr;
     QVector<Mesh *> allMesh;
+    int nextMeshIndice =1;
     Mesh *currentMesh;
     Mesh *mesh;
 

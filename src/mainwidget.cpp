@@ -56,8 +56,6 @@ void MainWidget::keyPressEvent(QKeyEvent *event)
     case Qt::Key_B:
         zoomOut();
         break;
-    case Qt::Key_O:
-        saveCurrentMesh();
     default:
         QOpenGLWidget::keyPressEvent(event);
     }
@@ -65,7 +63,22 @@ void MainWidget::keyPressEvent(QKeyEvent *event)
 
 void MainWidget::keyReleaseEvent(QKeyEvent *event)
 {
-    QOpenGLWidget::keyReleaseEvent(event);
+    switch (event->key()) {
+    case Qt::Key_O:
+        saveCurrentMesh();
+        break;
+    case Qt::Key_P:
+        parseMesh();
+        break;
+    case Qt::Key_C:
+        switchMesh();
+        break;
+    case Qt::Key_X:
+        deleteCurrentMesh();
+        break;
+    default:
+        QOpenGLWidget::keyReleaseEvent(event);
+    }
 }
 
 void MainWidget::moveCameraLeft()
@@ -293,4 +306,25 @@ void MainWidget::saveCurrentMesh(){
         return;
     }
     ply->writePlyFile(fileName.toStdString(),currentMesh);
+}
+
+void MainWidget::deleteCurrentMesh(){
+    allMesh.removeAt(nextMeshIndice-1);
+    currentMesh = allMesh[nextMeshIndice-1];
+    currentMesh->bindAndAllocateBuffer();
+}
+
+
+void MainWidget::switchMesh(){
+    if( nextMeshIndice >= allMesh.size() ) { nextMeshIndice = 0 ; }
+    currentMesh = allMesh[nextMeshIndice];
+    currentMesh->bindAndAllocateBuffer();
+    nextMeshIndice++;
+}
+
+void MainWidget::parseMesh(){
+    QVector<Mesh *> meshSupplementaire = currentMesh->parseMesh();
+    for(Mesh* mesh : meshSupplementaire) {
+        allMesh.append( mesh );
+    }
 }
