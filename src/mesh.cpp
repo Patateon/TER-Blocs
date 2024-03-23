@@ -35,8 +35,12 @@ void Mesh::buildKdtree(){
     for(const QVector3D& vertex : vertices){
         Vec3 v(vertex.x(),vertex.y(),vertex.z());
         verticesVectorVec3.push_back(v);
+    }*/
+    std::vector<std::vector<float>> points;
+    for (const QVector3D &point : vertices) {
+        points.push_back({point.x(), point.y(), point.z()});
     }
-    kdtree.build(verticesVectorVec3);*/
+    kdtree.build(points);
 }
 
 void Mesh::bindAndAllocateBuffer(){
