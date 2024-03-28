@@ -8,9 +8,9 @@
 
 using namespace std;
 
-#define DISTANCE_COULEURS 100.0 // entre 0 et 256
-#define DISTANCE_XYZ 0.25 // entre 0 et 1
-#define NBPOINTSMIN 420
+#define DISTANCE_COULEURS 70.0 // entre 0 et 256
+#define DISTANCE_XYZ 0.08 // entre 0 et 1
+#define NBPOINTSMIN 1000
 #define DISTANCE_COULEURS_DOMINANTE 0.15 // entre 0 et 1
 
 class Mesh
@@ -35,6 +35,7 @@ public:
 
 private:
     BasicANNkdTree kdtree;
+
 
     QVector<QVector3D> vertices;
     QVector<QVector3D> colors;

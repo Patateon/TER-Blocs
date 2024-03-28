@@ -39,9 +39,12 @@ public:
         }
         ANNvertex = annAllocPts(i_ps.size(),points_dimension);
 
-        for(unsigned int v = 0 ; v < i_ps.size() ; ++v )
-            for(unsigned int dimIt = 0 ; dimIt < points_dimension ; ++dimIt )
-                ANNvertex[v][dimIt] = i_ps[v][dimIt];
+        for(unsigned int v = 0 ; v < i_ps.size() ; ++v ){
+
+            ANNvertex[v][0] = i_ps[v].x();
+            ANNvertex[v][1] = i_ps[v].y();
+            ANNvertex[v][2] = i_ps[v].z();
+        }
 
         if(ANNtree != NULL)
             delete ANNtree;
@@ -55,8 +58,8 @@ public:
 
     template< class point_t >
     inline unsigned int nearest( point_t const & i_position ) const {
-        ANNpoint ann_point = annAllocPt(points_dimension);
-        for(unsigned int dimIt = 0 ; dimIt < points_dimension ; ++dimIt ) {
+        ANNpoint ann_point = annAllocPt(points_dimension);//ici
+        for(unsigned int dimIt = 0 ; dimIt < points_dimension ; ++dimIt ) {//ici
             ann_point[dimIt] = i_position[dimIt];
         }
         ANNidx idx ; ANNdist dd;
@@ -87,8 +90,8 @@ public:
     template< class point_t >
     inline
         void knearest( point_t const & i_position , int k , ANNidxArray id_nearest_neighbors , ANNdistArray square_distances_to_neighbors ) const {
-        ANNpoint ann_point = annAllocPt(points_dimension);
-        for(unsigned int dimIt = 0 ; dimIt < points_dimension ; ++dimIt ) {
+        ANNpoint ann_point = annAllocPt(points_dimension);//ici
+        for(unsigned int dimIt = 0 ; dimIt < points_dimension ; ++dimIt ) {//ici
             ann_point[dimIt] = i_position[dimIt];
         }
         ANNtree->annkSearch( ann_point , k , id_nearest_neighbors , square_distances_to_neighbors );

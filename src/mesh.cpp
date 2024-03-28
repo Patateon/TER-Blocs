@@ -151,13 +151,12 @@ void Mesh::clearMesh() {
     qDebug() << "Nombre de vertices apres nettoyage " << vertices.size();
 }
 void Mesh::buildKdtree(){
-/*
-    vector<Vec3> verticesVectorVec3;
+
+    std:vector<QVector3D> verticesVectorVec3;
     for(const QVector3D& vertex : vertices){
-        Vec3 v(vertex.x(),vertex.y(),vertex.z());
-        verticesVectorVec3.push_back(v);
+        verticesVectorVec3.push_back(vertex);
     }
-    kdtree.build(verticesVectorVec3);*/
+    kdtree.build(verticesVectorVec3);
 }
 
 void Mesh::bindAndAllocateBuffer(){

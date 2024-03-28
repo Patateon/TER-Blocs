@@ -9,12 +9,38 @@ greaterThan(QT_MAJOR_VERSION, 5): QT += widgets
 QT += opengl
 QT += openglwidgets
 SOURCES += \
+    ann/src/ANN.cpp \
+    ann/src/bd_fix_rad_search.cpp \
+    ann/src/bd_pr_search.cpp \
+    ann/src/bd_search.cpp \
+    ann/src/bd_tree.cpp \
+    ann/src/brute.cpp \
+    ann/src/kd_dump.cpp \
+    ann/src/kd_fix_rad_search.cpp \
+    ann/src/kd_pr_search.cpp \
+    ann/src/kd_search.cpp \
+    ann/src/kd_split.cpp \
+    ann/src/kd_tree.cpp \
+    ann/src/kd_util.cpp \
+    ann/src/perf.cpp \
     src/main.cpp \
     src/mainwidget.cpp \
     src/mesh.cpp \
     src/plyFile.cpp \
 
 HEADERS += \
+    ann/include/ANN/ANN.h \
+    ann/include/ANN/ANNperf.h \
+    ann/include/ANN/ANNx.h \
+    ann/src/bd_tree.h \
+    ann/src/kd_fix_rad_search.h \
+    ann/src/kd_pr_search.h \
+    ann/src/kd_search.h \
+    ann/src/kd_split.h \
+    ann/src/kd_tree.h \
+    ann/src/kd_util.h \
+    ann/src/pr_queue.h \
+    ann/src/pr_queue_k.h \
     headers/kdtree.h \
     headers/mainwidget.h \
     headers/mesh.h \
