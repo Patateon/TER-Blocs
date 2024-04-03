@@ -9,7 +9,7 @@
 #include <QFileDialog>
 
 
-#include "mesh.h"
+#include "nuageDePoint.h"
 
 
 
@@ -19,8 +19,8 @@ public:
     PlyFile();
     ~PlyFile();
 
-    void loadPlyFile(const std::string& filename, Mesh* mesh);
-    void writePlyFile(const std::string& filename, Mesh* mesh);
+    void loadPlyFile(const std::string& filename, NuageDePoint* ndp);
+    void writePlyFile(const std::string& filename, NuageDePoint* ndp);
 };
 
 

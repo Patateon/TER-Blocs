@@ -65,20 +65,23 @@ void MainWidget::keyReleaseEvent(QKeyEvent *event)
 {
     switch (event->key()) {
     case Qt::Key_O:
-        saveCurrentMesh();
+        saveCurrentNuageDePoint();
         break;
     case Qt::Key_P:
-        parseMesh();
+        parseNuageDePoint();
         break;
     case Qt::Key_C:
-        switchMesh();
+        switchNuageDePoint();
         break;
     case Qt::Key_X:
-        deleteCurrentMesh();
+        deleteCurrentNuageDePoint();
         break;
     case Qt::Key_I:
-        clearCurrentMesh();
+        clearCurrentNuageDePoint();
         break;
+    case Qt::Key_W:
+        afficher_ndpComparaison=!afficher_ndpComparaison;
+        update();
     default:
         QOpenGLWidget::keyReleaseEvent(event);
     }
@@ -201,11 +204,13 @@ void MainWidget::initializeGL()
     }
 
     // Load the selected PLY file
-    mesh = new Mesh();
-    allMesh.append(mesh);
-    currentMesh=mesh;
+    ndp = new NuageDePoint();
+    allNuageDePoint.append(ndp);
+    currentNuageDePoint=ndp;
     ply = new PlyFile();
-    ply->loadPlyFile(fileName.toStdString(), currentMesh);
+    ply->loadPlyFile(fileName.toStdString(), currentNuageDePoint);
+    ndpComparaison= new NuageDePoint();
+    ndpComparaison->clone(ndp);
 
 
     // Use QBasicTimer because its faster than QTimer
@@ -299,47 +304,48 @@ void MainWidget::paintGL()
 
     // Draw cube geometry
     //geometries->drawCubeGeometry(&program);
-    currentMesh->drawGeometry(&program);
+    currentNuageDePoint->drawGeometry(&program);
+    if(afficher_ndpComparaison){ndpComparaison->drawGeometry(&program);}
 }
 
-void MainWidget::saveCurrentMesh(){
+void MainWidget::saveCurrentNuageDePoint(){
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save PLY File"), "", tr("PLY Files (*.ply)"));
     if(fileName.isNull()) {
         qDebug() << "No file selected. Exiting initialization.";
         return;
     }
-    ply->writePlyFile(fileName.toStdString(),currentMesh);
+    ply->writePlyFile(fileName.toStdString(),currentNuageDePoint);
 }
 
-void MainWidget::deleteCurrentMesh(){
-    delete allMesh[nextMeshIndice - 1];
-    allMesh.removeAt(nextMeshIndice - 1);
-    if (!allMesh.isEmpty()) {
-        currentMesh = allMesh[nextMeshIndice - 1];
-        currentMesh->bindAndAllocateBuffer();
+void MainWidget::deleteCurrentNuageDePoint(){
+    delete allNuageDePoint[nextNuageDePointIndice - 1];
+    allNuageDePoint.removeAt(nextNuageDePointIndice - 1);
+    if (!allNuageDePoint.isEmpty()) {
+        currentNuageDePoint = allNuageDePoint[nextNuageDePointIndice - 1];
+        currentNuageDePoint->bindAndAllocateBuffer();
         update();
     } else {
-        currentMesh = nullptr;
+        currentNuageDePoint = nullptr;
     }
 }
 
-void MainWidget::clearCurrentMesh() {
-    currentMesh->clearMesh();
-    currentMesh->bindAndAllocateBuffer();
+void MainWidget::clearCurrentNuageDePoint() {
+    currentNuageDePoint->clearNuageDePoint();
+    currentNuageDePoint->bindAndAllocateBuffer();
     update();
 }
 
-void MainWidget::switchMesh(){
-    if( nextMeshIndice >= allMesh.size() ) { nextMeshIndice = 0 ; }
-    currentMesh = allMesh[nextMeshIndice];
-    currentMesh->bindAndAllocateBuffer();
-    nextMeshIndice++;
+void MainWidget::switchNuageDePoint(){
+    if( nextNuageDePointIndice >= allNuageDePoint.size() ) { nextNuageDePointIndice = 0 ; }
+    currentNuageDePoint = allNuageDePoint[nextNuageDePointIndice];
+    currentNuageDePoint->bindAndAllocateBuffer();
+    nextNuageDePointIndice++;
     update();
 }
 
-void MainWidget::parseMesh(){
-    QVector<Mesh *> meshSupplementaire = currentMesh->parseMesh();
-    for(Mesh* mesh : meshSupplementaire) {
-        allMesh.append( mesh );
+void MainWidget::parseNuageDePoint(){
+    QVector<NuageDePoint *> NuageDePointSupplementaire = currentNuageDePoint->parseNuageDePoint();
+    for(NuageDePoint* ndp : NuageDePointSupplementaire) {
+        allNuageDePoint.append( ndp );
     }
 }

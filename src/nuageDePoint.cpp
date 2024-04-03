@@ -1,4 +1,4 @@
-#include "../headers/mesh.h"
+#include "../headers/nuageDePoint.h"
 
 float euclidean_distance(const float p1, const float p2) {
     float dr = p1 - p2;
@@ -57,84 +57,86 @@ QVector3D getDominantColor(const QVector<QVector3D>& couleurs) {
     return couleurDominante;
 }
 
-Mesh::Mesh() {
+NuageDePoint::NuageDePoint() {
     arrayBuf.create();
     colorBuf.create();
     normalBuf.create();
 }
-Mesh::~Mesh() {
+NuageDePoint::~NuageDePoint() {
     arrayBuf.destroy();
     colorBuf.destroy();
     normalBuf.destroy();
 }
 
 
-void Mesh::addVertices(QVector3D vertice){
+void NuageDePoint::addVertices(QVector3D vertice){
     vertices.append(vertice);
 }
 
-void Mesh::addColors(QVector3D color){
+void NuageDePoint::addColors(QVector3D color){
     colors.append(color);
 }
 
-void Mesh::addNormals(QVector3D normal){
+void NuageDePoint::addNormals(QVector3D normal){
     normals.append(normal);
 }
 
-QVector<QVector3D>& Mesh::getVertices() {
+QVector<QVector3D>& NuageDePoint::getVertices() {
     return vertices;
 }
 
-QVector<QVector3D>& Mesh::getColors() {
+QVector<QVector3D>& NuageDePoint::getColors() {
     return colors;
 }
 
-QVector<QVector3D>& Mesh::getNormals() {
+QVector<QVector3D>& NuageDePoint::getNormals() {
     return normals;
 }
 
-QVector<Mesh *> Mesh::parseMesh() {
-    QVector<Mesh *> allMesh;
+QVector<NuageDePoint *> NuageDePoint::parseNuageDePoint() {
+    QVector<NuageDePoint *> allNuageDePoint;
     QVector<QVector3D> v = vertices;
     QVector<QVector3D> c = colors;
     QVector<QVector3D> n = normals;
     while( !v.isEmpty() ) {
-        Mesh* sousMesh = new Mesh();
-        sousMesh->addVertices( v[0] ); v.removeAt(0);
-        sousMesh->addColors( c[0] ); c.removeAt(0);
-        sousMesh->addNormals( n[0] ); n.removeAt(0);
-        QVector<QVector3D> sMeshColors=sousMesh->getColors();
-        QVector<QVector3D> sMeshVertices=sousMesh->getVertices();
+        NuageDePoint* sousNuageDePoint = new NuageDePoint();
+        sousNuageDePoint->addVertices( v[0] ); v.removeAt(0);
+        sousNuageDePoint->addColors( c[0] ); c.removeAt(0);
+        sousNuageDePoint->addNormals( n[0] ); n.removeAt(0);
+        QVector<QVector3D> sNuageDePointColors=sousNuageDePoint->getColors();
+        QVector<QVector3D> sNuageDePointVertices=sousNuageDePoint->getVertices();
         for(int i = 0; i < c.size(); i++ ) {
-            float distancePoint=euclidean_distance(sMeshVertices[0], v[i]);
+            float distancePoint=euclidean_distance(sNuageDePointVertices[0], v[i]);
             /*
-            float distanceRouge=euclidean_distance(sMeshColors[0].x()*256 , c[i].x()*256);
-            float distanceVert=euclidean_distance(sMeshColors[0].y()*256 , c[i].y()*256);
-            float distanceBleu=euclidean_distance(sMeshColors[0].z()*256 , c[i].z()*256);
+            float distanceRouge=euclidean_distance(sNuageDePointColors[0].x()*256 , c[i].x()*256);
+            float distanceVert=euclidean_distance(sNuageDePointColors[0].y()*256 , c[i].y()*256);
+            float distanceBleu=euclidean_distance(sNuageDePointColors[0].z()*256 , c[i].z()*256);
             */
-            float distanceCouleur=euclidean_distance(sMeshColors[0], c[i]);
+            float distanceCouleur=euclidean_distance(sNuageDePointColors[0], c[i]);
             //if(distancePoint < DISTANCE_XYZ && distanceRouge + distanceVert + distanceBleu < DISTANCE_COULEURS ) {
             if(distancePoint < DISTANCE_XYZ && distanceCouleur < DISTANCE_COULEURS/256.0 ) {
-                sousMesh->addVertices( v[i] ); v.removeAt(i);
-                sousMesh->addColors( c[i] ); c.removeAt(i);
-                sousMesh->addNormals( n[i] ); n.removeAt(i);
+                sousNuageDePoint->addVertices( v[i] ); v.removeAt(i);
+                sousNuageDePoint->addColors( c[i] ); c.removeAt(i);
+                sousNuageDePoint->addNormals( n[i] ); n.removeAt(i);
                 i--;
             }
         }
-        if( sousMesh->getVertices().size() > NBPOINTSMIN) {
-            allMesh.append(sousMesh);
-            qDebug() << "Sous mesh n: " << allMesh.size() << "de taille : " << allMesh[allMesh.size()-1]->getVertices().size();
+        if( sousNuageDePoint->getVertices().size() > NBPOINTSMIN) {
+            allNuageDePoint.append(sousNuageDePoint);
+            qDebug() << "Sous NuageDePoint n: " << allNuageDePoint.size() << "de taille : " << allNuageDePoint[allNuageDePoint.size()-1]->getVertices().size();
         }
         else{
-            delete sousMesh;
+            delete sousNuageDePoint;
         }
     }
-    qDebug() << "Nombre de sous mesh par couleur " << allMesh.size();
-    qDebug() << "Nombre de vertices du premier sous mesh " << allMesh[0]->getVertices().size();
-    return allMesh;
+    qDebug() << "Nombre de sous NuageDePoint par couleur " << allNuageDePoint.size();
+    qDebug() << "Nombre de vertices du premier sous NuageDePoint " << allNuageDePoint[0]->getVertices().size();
+    return allNuageDePoint;
 }
 
-void Mesh::clearMesh() {
+
+
+void NuageDePoint::clearNuageDePoint() {
     qDebug() << "Nombre de vertices avant nettoyage " << vertices.size();
     QVector3D dominantColor = getDominantColor(colors);
     qDebug() << "Couleur dominante " << dominantColor.x()  << dominantColor.y () << dominantColor.z();
@@ -150,16 +152,24 @@ void Mesh::clearMesh() {
     }
     qDebug() << "Nombre de vertices apres nettoyage " << vertices.size();
 }
-void Mesh::buildKdtree(){
 
-    std:vector<QVector3D> verticesVectorVec3;
+void NuageDePoint::clone( NuageDePoint* aCopier) {
+    vertices = aCopier->vertices;
+    colors = aCopier->colors;
+    normals = aCopier->normals;
+
+    (this)->bindAndAllocateBuffer();
+}
+void NuageDePoint::buildKdtree(){
+
+    vector<QVector3D> verticesVectorVec3;
     for(const QVector3D& vertex : vertices){
         verticesVectorVec3.push_back(vertex);
     }
     kdtree.build(verticesVectorVec3);
 }
 
-void Mesh::bindAndAllocateBuffer(){
+void NuageDePoint::bindAndAllocateBuffer(){
     arrayBuf.bind();
     arrayBuf.allocate(vertices.data(), vertices.size() * sizeof(QVector3D));
     colorBuf.bind();
@@ -169,7 +179,7 @@ void Mesh::bindAndAllocateBuffer(){
 }
 
 
-void Mesh::drawGeometry(QOpenGLShaderProgram *program) {
+void NuageDePoint::drawGeometry(QOpenGLShaderProgram *program) {
 
     arrayBuf.bind();
     int vertexLocation = program->attributeLocation("vertex");

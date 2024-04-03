@@ -1,5 +1,5 @@
-#ifndef MESH_H
-#define MESH_H
+#ifndef NuageDePoint_H
+#define NuageDePoint_H
 
 #include "kdtree.h"
 #include <vector>
@@ -13,11 +13,12 @@ using namespace std;
 #define NBPOINTSMIN 1000
 #define DISTANCE_COULEURS_DOMINANTE 0.15 // entre 0 et 1
 
-class Mesh
+class NuageDePoint
 {
 public:
-    Mesh();
-    ~Mesh();
+    NuageDePoint();
+    ~NuageDePoint();
+    void clone(NuageDePoint* aCopier);
 
     void drawGeometry(QOpenGLShaderProgram *program);
 
@@ -30,12 +31,13 @@ public:
     void bindAndAllocateBuffer();
     void buildKdtree();
 
-    QVector<Mesh *> parseMesh();
-    void clearMesh();
+    BasicANNkdTree getKdTree(){return kdtree;}
+
+    QVector<NuageDePoint *> parseNuageDePoint();
+    void clearNuageDePoint();
 
 private:
     BasicANNkdTree kdtree;
-
 
     QVector<QVector3D> vertices;
     QVector<QVector3D> colors;
@@ -46,4 +48,4 @@ private:
     QOpenGLBuffer normalBuf;
 };
 
-#endif // MESH_H
+#endif // NuageDePoint_H

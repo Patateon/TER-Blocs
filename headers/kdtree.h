@@ -58,6 +58,7 @@ public:
 
     template< class point_t >
     inline unsigned int nearest( point_t const & i_position ) const {
+
         ANNpoint ann_point = annAllocPt(points_dimension);
         ann_point[0]=i_position.x();
         ann_point[1]=i_position.y();
