@@ -25,7 +25,7 @@ SOURCES += \
     ann/src/perf.cpp \
     src/main.cpp \
     src/mainwidget.cpp \
-    src/mesh.cpp \
+    src/nuageDePoint.cpp \
     src/plyFile.cpp \
 
 HEADERS += \
@@ -43,7 +43,7 @@ HEADERS += \
     ann/src/pr_queue_k.h \
     headers/kdtree.h \
     headers/mainwidget.h \
-    headers/mesh.h \
+    headers/nuageDePoint.h \
     headers/plyFile.h \
     ANN/ANN.h \
 

@@ -11,7 +11,7 @@
 
 PlyFile::PlyFile(){};
 
-void PlyFile::loadPlyFile(const std::string& filename, Mesh *mesh) {
+void PlyFile::loadPlyFile(const std::string& filename, NuageDePoint *ndp) {
 
     std::ifstream file(filename);
 
@@ -60,16 +60,16 @@ void PlyFile::loadPlyFile(const std::string& filename, Mesh *mesh) {
             iss >>x>>y >> z;
             iss >>r>> g >> b;
             iss >>nx>> ny >> nz;
-            mesh->addVertices(QVector3D(x,y,z));
-            mesh->addColors(QVector3D(r/256.0f,g/256.0f,b/256.0f));
-            mesh->addNormals(QVector3D(nx,ny,nz));
+            ndp->addVertices(QVector3D(x,y,z));
+            ndp->addColors(QVector3D(r/256.0f,g/256.0f,b/256.0f));
+            ndp->addNormals(QVector3D(nx,ny,nz));
             count_vertex++;
         }
     }
     file.close();  // Close the file
-    QVector<QVector3D> vertices=mesh->getVertices();
-    QVector<QVector3D> colors=mesh->getColors();
-    QVector<QVector3D> normals=mesh->getNormals();
+    QVector<QVector3D> vertices=ndp->getVertices();
+    QVector<QVector3D> colors=ndp->getColors();
+    QVector<QVector3D> normals=ndp->getNormals();
     qDebug() << "Number of vertices : " << nbVertices;
     qDebug() << "Number of vertices read: " << vertices.size();
     qDebug() << "Vertices at indices 0, 10, and 50:";
@@ -103,18 +103,18 @@ void PlyFile::loadPlyFile(const std::string& filename, Mesh *mesh) {
         vertex = scale * (vertex - center);
     }
 
-    mesh->bindAndAllocateBuffer();
+    ndp->bindAndAllocateBuffer();
   }
 
-void PlyFile::writePlyFile(const std::string& filename, Mesh* mesh) {
+void PlyFile::writePlyFile(const std::string& filename, NuageDePoint* ndp) {
     std::ofstream file(filename);
     if (!file.is_open()) {
         qDebug() << "Failed to open .ply file for writing";
         return;
     }
-    QVector<QVector3D> vertices=mesh->getVertices();
-    QVector<QVector3D> colors=mesh->getColors();
-    QVector<QVector3D> normals=mesh->getNormals();
+    QVector<QVector3D> vertices=ndp->getVertices();
+    QVector<QVector3D> colors=ndp->getColors();
+    QVector<QVector3D> normals=ndp->getNormals();
     // Write PLY header
     file << "ply\n";
     file << "format ascii 1.0\n";

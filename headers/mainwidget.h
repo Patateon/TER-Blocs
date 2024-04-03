@@ -44,11 +44,11 @@ protected:
     void zoomIn();
     void zoomOut();
 
-    void saveCurrentMesh();
-    void deleteCurrentMesh();
-    void clearCurrentMesh();
-    void switchMesh();
-    void parseMesh();
+    void saveCurrentNuageDePoint();
+    void deleteCurrentNuageDePoint();
+    void clearCurrentNuageDePoint();
+    void switchNuageDePoint();
+    void parseNuageDePoint();
 
     void initializeGL() override;
     void resizeGL(int w, int h) override;
@@ -63,10 +63,13 @@ private:
     GeometryEngine *geometries = nullptr;
 
     PlyFile *ply =nullptr;
-    QVector<Mesh *> allMesh;
-    int nextMeshIndice =1;
-    Mesh *currentMesh;
-    Mesh *mesh;
+    QVector<NuageDePoint *> allNuageDePoint;
+    int nextNuageDePointIndice =1;
+    NuageDePoint *currentNuageDePoint;
+    NuageDePoint *ndp;
+
+    NuageDePoint *ndpComparaison;
+    bool afficher_ndpComparaison=false;
 
     QOpenGLTexture *texture = nullptr;
 
