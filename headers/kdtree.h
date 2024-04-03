@@ -58,10 +58,10 @@ public:
 
     template< class point_t >
     inline unsigned int nearest( point_t const & i_position ) const {
-        ANNpoint ann_point = annAllocPt(points_dimension);//ici
-        for(unsigned int dimIt = 0 ; dimIt < points_dimension ; ++dimIt ) {//ici
-            ann_point[dimIt] = i_position[dimIt];
-        }
+        ANNpoint ann_point = annAllocPt(points_dimension);
+        ann_point[0]=i_position.x();
+        ann_point[1]=i_position.y();
+        ann_point[2]=i_position.z();
         ANNidx idx ; ANNdist dd;
         ANNtree->annkSearch( ann_point , 1 , &idx , &dd );
         annDeallocPt(ann_point);
@@ -90,10 +90,10 @@ public:
     template< class point_t >
     inline
         void knearest( point_t const & i_position , int k , ANNidxArray id_nearest_neighbors , ANNdistArray square_distances_to_neighbors ) const {
-        ANNpoint ann_point = annAllocPt(points_dimension);//ici
-        for(unsigned int dimIt = 0 ; dimIt < points_dimension ; ++dimIt ) {//ici
-            ann_point[dimIt] = i_position[dimIt];
-        }
+        ANNpoint ann_point = annAllocPt(points_dimension);
+        ann_point[0]=i_position.x();
+        ann_point[1]=i_position.y();
+        ann_point[2]=i_position.z();
         ANNtree->annkSearch( ann_point , k , id_nearest_neighbors , square_distances_to_neighbors );
         annDeallocPt(ann_point);
     }
