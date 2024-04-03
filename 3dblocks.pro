@@ -27,6 +27,8 @@ SOURCES += \
     src/mainwidget.cpp \
     src/nuageDePoint.cpp \
     src/plyFile.cpp \
+    src/Camera.cpp \
+    src/Trackball.cpp \
 
 HEADERS += \
     ann/include/ANN/ANN.h \
@@ -45,6 +47,8 @@ HEADERS += \
     headers/mainwidget.h \
     headers/nuageDePoint.h \
     headers/plyFile.h \
+    headers/Camera.h \
+    headers/Trackball.h \
     ANN/ANN.h \
 
 RESOURCES += \

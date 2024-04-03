@@ -5,6 +5,7 @@
 #define MAINWIDGET_H
 
 #include "plyFile.h"
+#include "Camera.h"
 
 
 #include <QOpenGLWidget>
@@ -30,19 +31,11 @@ public:
 protected:
     void mousePressEvent(QMouseEvent *e) override;
     void mouseReleaseEvent(QMouseEvent *e) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
     void timerEvent(QTimerEvent *e) override;
-    void moveCameraUp();
-    void moveCameraDown();
-    void moveCameraRight();
-    void moveCameraLeft();
-    void keyReleaseEvent(QKeyEvent *event);
-    void keyPressEvent(QKeyEvent *event);
-    void rotateCameraLeft();
-    void rotateCameraRight();
-    void rotateCameraUp();
-    void rotateCameraDown();
-    void zoomIn();
-    void zoomOut();
+    void keyReleaseEvent(QKeyEvent *event) override;
+    void keyPressEvent(QKeyEvent *event) override;
+
 
     void saveCurrentNuageDePoint();
     void deleteCurrentNuageDePoint();
@@ -73,12 +66,18 @@ private:
 
     QOpenGLTexture *texture = nullptr;
 
-    QMatrix4x4 projection;
+    Camera camera;
+    static unsigned int SCREENWIDTH ;
+    static unsigned int SCREENHEIGHT ;
+    static bool mouseRotatePressed ;
+    static bool mouseMovePressed ;
+    static bool mouseZoomPressed ;
+    static int lastX, lastY, lastZoom;
+    static bool fullScreen ;
+
 
     QVector2D mousePressPosition;
-    QVector3D rotationAxis;
-    qreal angularSpeed = 0;
-    QQuaternion rotation;
+
 };
 
 #endif // MAINWIDGET_H

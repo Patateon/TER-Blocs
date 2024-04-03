@@ -3,6 +3,16 @@
 
 #include "../headers/mainwidget.h"
 
+unsigned int MainWidget::SCREENWIDTH = 640;
+unsigned int MainWidget::SCREENHEIGHT = 480;
+bool MainWidget::mouseRotatePressed = false;
+bool MainWidget::mouseMovePressed = false;
+bool MainWidget::mouseZoomPressed = false;
+int MainWidget::lastX = 0;
+int MainWidget::lastY = 0;
+int MainWidget::lastZoom = 0;
+bool MainWidget::fullScreen = false;
+
 MainWidget::~MainWidget()
 {
     // Make sure the context is current when deleting the texture
@@ -15,47 +25,72 @@ MainWidget::~MainWidget()
 //! [0]
 void MainWidget::mousePressEvent(QMouseEvent *e)
 {
-    // Save mouse press position
     mousePressPosition = QVector2D(e->position());
+    switch (e->button()) {
+    case Qt::LeftButton:
+        camera.beginRotate(e->position().x(), e->position().y());
+        mouseMovePressed = false;
+        mouseRotatePressed = true;
+        mouseZoomPressed = false;
+        break;
+    case Qt::RightButton:
+        lastX = e->position().x();
+        lastY = e->position().y();
+        mouseMovePressed = true;
+        mouseRotatePressed = false;
+        mouseZoomPressed = false;
+        break;
+    case Qt::MiddleButton:
+        if (!mouseZoomPressed) {
+            lastZoom = e->position().y();
+            mouseMovePressed = false;
+            mouseRotatePressed = false;
+            mouseZoomPressed = true;
+        }
+        break;
+    default:
+        QOpenGLWidget::mousePressEvent(e);
+        break;
+    }
+}
+
+void MainWidget::mouseMoveEvent(QMouseEvent *event)
+{
+    int x = event->position().x();
+    int y = event->position().y();
+
+    if (mouseRotatePressed) {
+        camera.rotate(x, y);
+    }
+    else if (mouseMovePressed) {
+        camera.move((x - lastX) / static_cast<float>(SCREENWIDTH), (lastY - y) / static_cast<float>(SCREENHEIGHT), 0.0);
+        lastX = x;
+        lastY = y;
+    }
+    else if (mouseZoomPressed) {
+        camera.zoom(static_cast<float>(y - lastZoom) / SCREENHEIGHT);
+        lastZoom = y;
+    }
+    update();
 }
 
 void MainWidget::mouseReleaseEvent(QMouseEvent *e)
 {
+    // Clear mouse press positions
+    mousePressPosition = QVector2D();
+
+    // Reset mouse pressed flags
+    mouseMovePressed = false;
+    mouseRotatePressed = false;
+    mouseZoomPressed = false;
+
+    QOpenGLWidget::mouseReleaseEvent(e);
 }
+
 
 void MainWidget::keyPressEvent(QKeyEvent *event)
 {
     switch (event->key()) {
-    case Qt::Key_Left:
-        moveCameraLeft();
-        break;
-    case Qt::Key_Right:
-        moveCameraRight();
-        break;
-    case Qt::Key_Up:
-        moveCameraUp();
-        break;
-    case Qt::Key_Down:
-        moveCameraDown();
-        break;
-    case Qt::Key_S:
-        rotateCameraDown();
-        break;
-    case Qt::Key_Z:
-        rotateCameraUp();
-        break;
-    case Qt::Key_Q:
-        rotateCameraLeft();
-        break;
-    case Qt::Key_D:
-        rotateCameraRight();
-        break;
-    case Qt::Key_V:
-        zoomIn();
-        break;
-    case Qt::Key_B:
-        zoomOut();
-        break;
     default:
         QOpenGLWidget::keyPressEvent(event);
     }
@@ -82,108 +117,24 @@ void MainWidget::keyReleaseEvent(QKeyEvent *event)
     case Qt::Key_W:
         afficher_ndpComparaison=!afficher_ndpComparaison;
         update();
+        break;
     default:
         QOpenGLWidget::keyReleaseEvent(event);
+        break;
     }
 }
 
-void MainWidget::moveCameraLeft()
-{
-    QVector3D translation(-0.1, 0.0, 0.0);
-    projection.translate(translation);
-    update();
-}
 
-void MainWidget::moveCameraRight()
-{
-    QVector3D translation(0.1, 0.0, 0.0);
-    projection.translate(translation);
-    update();
-}
 
-void MainWidget::moveCameraUp()
-{
-    QVector3D translation(0.0, 0.1, 0.0);
-    projection.translate(translation);
-    update();
-}
 
-void MainWidget::moveCameraDown()
-{
-    QVector3D translation(0.0, -0.1, 0.0);
-    projection.translate(translation);
-    update();
-}
-void MainWidget::rotateCameraLeft()
-{
-    QVector3D translation(0.0, 0.0, 0.0);
-    rotation = QQuaternion::fromAxisAndAngle(QVector3D(0, 1, 0), 5) * rotation;
-    translation = rotation * translation;
-    projection.translate(translation);
-    update();
-}
 
-void MainWidget::rotateCameraRight()
-{
-    QVector3D translation(0.0, 0.0, 0.0);
-    rotation = QQuaternion::fromAxisAndAngle(QVector3D(0, 1, 0), -5) * rotation;
-    translation = rotation * translation;
-    projection.translate(translation);
-    update();
-}
 
-void MainWidget::rotateCameraUp()
-{
-    // Déplacer la caméra vers le haut
-    QVector3D translation(0.0, 0.0, 0.0);
-    rotation = QQuaternion::fromAxisAndAngle(QVector3D(1, 0, 0), -5) * rotation;
-    translation = rotation * translation;
-    projection.translate(translation);
-    update();
-}
-
-void MainWidget::rotateCameraDown()
-{
-    QVector3D translation(0.0, 0.0, 0.0);
-    rotation = QQuaternion::fromAxisAndAngle(QVector3D(1, 0, 0), 5) * rotation;
-    translation = rotation * translation;
-    projection.translate(translation);
-    update();
-}
-
-void MainWidget::zoomIn()
-{
-    QVector3D translation(0.0, 0.0, 0.1);
-    translation = rotation * translation;
-    projection.translate(translation);
-    update();
-}
-
-void MainWidget::zoomOut()
-{
-    QVector3D translation(0.0, 0.0,- 0.1);
-    translation = rotation * translation;
-    projection.translate(translation);
-    update();
-}
 //! [0]
 
 //! [1]
 void MainWidget::timerEvent(QTimerEvent *)
 {
-    // Decrease angular speed (friction)
-    angularSpeed *= 0.99;
 
-    // Stop rotation when speed goes below threshold
-    if (angularSpeed < 0.01) {
-        angularSpeed = 0.0;
-    } else {
-        // Update rotation
-        rotation = QQuaternion::fromAxisAndAngle(rotationAxis, angularSpeed) * rotation;
-
-        // Request an update
-        update();
-    }
 }
 //! [1]
 
@@ -211,7 +162,7 @@ void MainWidget::initializeGL()
     ply->loadPlyFile(fileName.toStdString(), currentNuageDePoint);
     ndpComparaison= new NuageDePoint();
     ndpComparaison->clone(ndp);
-
+    camera.apply();
 
     // Use QBasicTimer because its faster than QTimer
     timer.start(12, this);
@@ -259,17 +210,7 @@ void MainWidget::initTextures()
 //! [5]
 void MainWidget::resizeGL(int w, int h)
 {
-    // Calculate aspect ratio
-    qreal aspect = qreal(w) / qreal(h ? h : 1);
-
-    // Set near plane to 3.0, far plane to 7.0, field of view 45 degrees
-    const qreal zNear = 1.0, zFar = 25.0, fov = 45.0;
-
-    // Reset projection
-    projection.setToIdentity();
-
-    // Set perspective projection
-    projection.perspective(fov, aspect, zNear, zFar);
+    camera.resize (w, h);
 }
 //! [5]
 
@@ -289,21 +230,23 @@ void MainWidget::paintGL()
     texture->bind();
     program.bind();
 
+
     //! [6]
     // Calculate model view transformation
     QMatrix4x4 matrix;
-    matrix.translate(0.0, 0.0, -8.0);
-    matrix.rotate(rotation);
+    float x,y,z;
+    camera.getPos(x,y,z);
+    matrix.translate(x,y,z);
+
 
     // Set modelview-projection matrix
-    program.setUniformValue("mvp_matrix", projection * matrix);
+    program.setUniformValue("mvp_matrix", camera.getProjectionMatrix() * matrix);
     //! [6]
 
     // Use texture unit 0 which contains cube.png
     //program.setUniformValue("texture", 0);
 
-    // Draw cube geometry
-    //geometries->drawCubeGeometry(&program);
+    // Draw nuage de point
     currentNuageDePoint->drawGeometry(&program);
     if(afficher_ndpComparaison){ndpComparaison->drawGeometry(&program);}
 }
