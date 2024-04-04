@@ -34,26 +34,40 @@ Camera::Camera () {
   
   trackball (curquat, 0.0, 0.0, 0.0, 0.0);
   x = 0.0; // Set the initial x position
-  y = 0.0; // Set the initial y position
+  y = 1.0; // Set the initial y position
   z = 8.0; // Set the initial z position
   _zoom = 0.0;
 }
 
-void Camera::lookAt(const QVector3D &target) {
-    QVector3D direction = target - QVector3D(x, y, z);
-    qDebug()<<direction;
-    direction.normalize();
 
-    // Calculer la rotation à partir de la direction désirée
-    QQuaternion rotation = QQuaternion::fromDirection(QVector3D(0, 0, -1), direction);
+void Camera::lookAt(QVector3D target) {
+    QVector3D cameraPos(x, y, z);
+    QVector3D up(0.0f, 1.0f, 0.0f);
 
-    // Mettre à jour le quaternion de rotation sans modifier la position de la caméra
-    QQuaternion newRotation = rotation * QQuaternion(curquat[0], curquat[1], curquat[2], curquat[3]);
-    curquat[0] = newRotation.scalar();
-    curquat[1] = newRotation.x();
-    curquat[2] = newRotation.y();
-    curquat[3] = newRotation.z();
+    // Calcule la direction de vue
+    QVector3D viewDirection = (target - cameraPos).normalized();
+    qDebug()<<(target - cameraPos);
+
+    // Calcule la rotation pour faire face au point cible
+    QQuaternion rotation = QQuaternion::rotationTo(QVector3D(0, 0, -1), viewDirection);
+
+    // Applique la rotation à la direction actuelle de la caméra
+    QVector3D rotatedDirection = rotation.rotatedVector(QVector3D(0, 0, -1));
+
+    // Met à jour la position de la caméra pour qu'elle regarde le point cible
+    x = target.x() - rotatedDirection.x();
+    y = target.y() - rotatedDirection.y();
+    z = target.z() - rotatedDirection.z();
+
+    // Met à jour la rotation de la caméra
+    curquat[0] = rotation.scalar();
+    curquat[1] = rotation.x();
+    curquat[2] = rotation.y();
+    curquat[3] = rotation.z();
 }
+
+
+
 
 
 

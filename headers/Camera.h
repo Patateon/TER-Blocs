@@ -33,7 +33,7 @@ public:
   QMatrix4x4 getProjectionMatrix() const;
   
   void initPos ();
-  void lookAt(const QVector3D &target);
+  void lookAt(QVector3D target);
   void move (float dx, float dy, float dz);
   void beginRotate (int u, int v);
   void rotate (int u, int v);
