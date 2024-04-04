@@ -114,6 +114,9 @@ void MainWidget::keyReleaseEvent(QKeyEvent *event)
     case Qt::Key_I:
         clearCurrentNuageDePoint();
         break;
+    case Qt::Key_U:
+        analyseNuageDePoint();
+        break;
     case Qt::Key_W:
         afficher_ndpComparaison=!afficher_ndpComparaison;
         update();
@@ -148,7 +151,7 @@ void MainWidget::initializeGL()
     initTextures();
 
     // Ask user to select a PLY file
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open PLY File"), "", tr("PLY Files (*.ply)"));
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open PLY File"), "../TER-Blocs/data", tr("PLY Files (*.ply)"));
     if(fileName.isNull()) {
         qDebug() << "No file selected. Exiting initialization.";
         return;
@@ -165,13 +168,13 @@ void MainWidget::initializeGL()
     QVector3D target(-1.9f,1.3f, 0.8f);
     float x,y,z;
     camera.getPos(x,y,z);
-    qDebug()<<x<<" "<<y<<" "<<z;
-    camera.lookAt(target);
+   // qDebug()<<x<<" "<<y<<" "<<z;
+    //camera.lookAt(target);
     camera.getPos(x,y,z);
-    qDebug()<<x<<" "<<y<<" "<<z;
+   // qDebug()<<x<<" "<<y<<" "<<z;
     camera.apply();
     camera.getPos(x,y,z);
-    qDebug()<<x<<" "<<y<<" "<<z;
+   // qDebug()<<x<<" "<<y<<" "<<z;
 
     // Use QBasicTimer because its faster than QTimer
     timer.start(12, this);
@@ -300,4 +303,9 @@ void MainWidget::parseNuageDePoint(){
     for(NuageDePoint* ndp : NuageDePointSupplementaire) {
         allNuageDePoint.append( ndp );
     }
+}
+
+void MainWidget::analyseNuageDePoint(){
+    currentNuageDePoint->analyseNuageDePoint();
+
 }

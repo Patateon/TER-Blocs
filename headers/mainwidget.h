@@ -42,6 +42,7 @@ protected:
     void clearCurrentNuageDePoint();
     void switchNuageDePoint();
     void parseNuageDePoint();
+    void analyseNuageDePoint();
 
     void initializeGL() override;
     void resizeGL(int w, int h) override;

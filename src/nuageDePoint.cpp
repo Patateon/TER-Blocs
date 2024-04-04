@@ -134,7 +134,74 @@ QVector<NuageDePoint *> NuageDePoint::parseNuageDePoint() {
     return allNuageDePoint;
 }
 
+float dotProduct(const QVector3D& v1, const QVector3D& v2) {
+    return v1.x() * v2.x() + v1.y() * v2.y() + v1.z() * v2.z();
+}
 
+void NuageDePoint::analyseNuageDePoint(){
+    QVector3D moyNormals;
+    QVector3D moyPositions;
+    float moyDotProductNormals=0;
+    // int nbDotProductSupA075=0;
+    // int nbDotProductSupA05Inf075=0;
+    // int nbDotProductSupA025Inf05=0;
+    // int nbDotProductSupA00Inf025=0;
+    // int nbDotProductInfA00SupAMinus025=0;
+    // int nbDotProductInfAMinus025SupAMinus05=0;
+    int nbDotProductSupA05=0;
+    int nbDotProductInfA05SupAMinus05=0;
+    int nbDotProductInfAMinus05=0;
+    int pasTrou=0; int trou=0;
+    vector<int> vecPeutEtreTrou;
+    for(int i = 0; i < normals.size() ; i++){
+        moyNormals+=normals[i];
+        moyPositions+= vertices[i];
+        int peutEtreTrou=0;
+        for(int j = i; j < normals.size() ; j++){
+            float dotP=dotProduct(normals[i] , normals[j]);
+            // dotP >= 0.75 ? nbDotProductSupA075++ :
+            //     dotP >=0.5 ? nbDotProductSupA05Inf075++ :
+            //         dotP >= 0.25 ? nbDotProductSupA025Inf05++ :
+            //             dotP >= 0.0 ? nbDotProductSupA00Inf025++ :
+            //                 dotP >= -0.25 ? nbDotProductInfA00SupAMinus025++ :
+            //                     dotP >= -0.5 ? nbDotProductInfAMinus025SupAMinus05++ : nbDotProductInfAMinus05++;
+
+            dotP >= 0.5 ? nbDotProductSupA05++ : dotP >= -0.5 ? nbDotProductInfA05SupAMinus05++ : nbDotProductInfAMinus05++;
+            moyDotProductNormals+=dotP;
+
+            if(dotP < -0.5){
+                QVector3D vec=vertices[j]-vertices[i];
+                vec.normalize();
+                float dotPjvec=dotProduct(vec,normals[i]);
+                dotPjvec < 0.5 ? pasTrou++ : peutEtreTrou++ ;
+            }
+        }
+        vecPeutEtreTrou.push_back(peutEtreTrou);
+    }
+    for(int i = 0 ; i < vecPeutEtreTrou.size() ; i++){
+        if(vecPeutEtreTrou[i]>0.1*vertices.size()){trou+=vecPeutEtreTrou[i];}
+        else{pasTrou+=vecPeutEtreTrou[i];}
+    }
+    moyPositions/=vertices.size();
+    moyNormals/=normals.size();
+    moyDotProductNormals/=(normals.size()*(normals.size() + 1))/2;
+    qDebug() << " Moyenne des normales : " << moyNormals;
+    qDebug() << " Moyenne des Position : " << moyPositions;
+    qDebug() << " Moyenne des produits scalaires entre les normales : " << moyDotProductNormals;
+    // qDebug() << " Nombre de DP >= 0.75 : " << nbDotProductSupA075;
+    // qDebug() << " Nombre de DP >= 0.5 : & < 0.75 : " << nbDotProductSupA05Inf075;
+    // qDebug() << " Nombre de DP >= 0.25 &  < 0.5 : " << nbDotProductSupA025Inf05;
+    // qDebug() << " Nombre de DP >= 0.0 & < 0.25 : " << nbDotProductSupA00Inf025;
+    // qDebug() << " Nombre de DP < 0.0 &  >= -0.25 : " << nbDotProductInfA00SupAMinus025;
+    // qDebug() << " Nombre de DP < -0.25 &  >= -0.5 : " << nbDotProductInfAMinus025SupAMinus05;
+    // qDebug() << " Nombre de DP >= -0.5 : & < 0.5 : " << nbDotProductSupAMinus05Inf05;
+
+    qDebug() << " Nombre de DP >= 0.5 : " << nbDotProductSupA05;
+    qDebug() << " Nombre de DP >= -0.5 & < 0.5 : " << nbDotProductInfA05SupAMinus05;
+    qDebug() << " Nombre de DP < -0.5 : " << nbDotProductInfAMinus05;
+    qDebug() << " Trou? : " << trou << "Contour externe : " << pasTrou;
+
+}
 
 void NuageDePoint::clearNuageDePoint() {
     qDebug() << "Nombre de vertices avant nettoyage " << vertices.size();

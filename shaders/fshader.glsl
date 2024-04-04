@@ -20,7 +20,7 @@ void main()
     float diffuse = max(dot(vNormal, lightDir), 0.0);
 
     // Calcul de l'intensité de la lumière ambiante
-    float ambient = 0.3; // Réglage de l'intensité ambiante
+    float ambient = 0.1; // Réglage de l'intensité ambiante
 
     // Couleur diffuse du matériau
     vec3 diffuseColor = vColor;
