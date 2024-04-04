@@ -11,9 +11,11 @@ attribute vec3 color;
 attribute vec3 normal;
 varying vec3 vColor;
 varying vec3 vNormal;
+varying vec3 vPosition;
 
 void main() {
     gl_Position = mvp_matrix * vec4(vertex, 1.0);
+    vPosition= vec3(gl_Position);
     vColor = color;
     vNormal = normal;
 }

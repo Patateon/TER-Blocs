@@ -34,6 +34,7 @@ public:
     BasicANNkdTree getKdTree(){return kdtree;}
 
     QVector<NuageDePoint *> parseNuageDePoint();
+    void analyseNuageDePoint();
     void clearNuageDePoint();
 
 private:

@@ -60,7 +60,7 @@ void PlyFile::loadPlyFile(const std::string& filename, NuageDePoint *ndp) {
             iss >>x>>y >> z;
             iss >>r>> g >> b;
             iss >>nx>> ny >> nz;
-            ndp->addVertices(QVector3D(x,y,z));
+            ndp->addVertices(QVector3D(-x,-y,-z));
             ndp->addColors(QVector3D(r/256.0f,g/256.0f,b/256.0f));
             ndp->addNormals(QVector3D(nx,ny,nz));
             count_vertex++;
@@ -102,7 +102,8 @@ void PlyFile::loadPlyFile(const std::string& filename, NuageDePoint *ndp) {
     for (QVector3D& vertex : vertices) {
         vertex = scale * (vertex - center);
     }
-
+    qDebug() << "Vertices apres emboitage:";
+    qDebug() << vertices[1];
     ndp->bindAndAllocateBuffer();
   }
 
