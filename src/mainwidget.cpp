@@ -162,7 +162,16 @@ void MainWidget::initializeGL()
     ply->loadPlyFile(fileName.toStdString(), currentNuageDePoint);
     ndpComparaison= new NuageDePoint();
     ndpComparaison->clone(ndp);
+    QVector3D target(-1.9f,1.3f, 0.8f);
+    float x,y,z;
+    camera.getPos(x,y,z);
+    qDebug()<<x<<" "<<y<<" "<<z;
+    camera.lookAt(target);
+    camera.getPos(x,y,z);
+    qDebug()<<x<<" "<<y<<" "<<z;
     camera.apply();
+    camera.getPos(x,y,z);
+    qDebug()<<x<<" "<<y<<" "<<z;
 
     // Use QBasicTimer because its faster than QTimer
     timer.start(12, this);

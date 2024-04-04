@@ -39,6 +39,28 @@ Camera::Camera () {
   _zoom = 0.0;
 }
 
+void Camera::lookAt(const QVector3D &target) {
+    QVector3D direction = target - QVector3D(x, y, z);
+    qDebug()<<direction;
+    direction.normalize();
+
+    // Calculer la rotation à partir de la direction désirée
+    QQuaternion rotation = QQuaternion::fromDirection(QVector3D(0, 0, -1), direction);
+
+    // Mettre à jour le quaternion de rotation sans modifier la position de la caméra
+    QQuaternion newRotation = rotation * QQuaternion(curquat[0], curquat[1], curquat[2], curquat[3]);
+    curquat[0] = newRotation.scalar();
+    curquat[1] = newRotation.x();
+    curquat[2] = newRotation.y();
+    curquat[3] = newRotation.z();
+}
+
+
+
+
+
+
+
 QMatrix4x4 Camera::getProjectionMatrix() const {
     QMatrix4x4 projectionMatrix;
     projectionMatrix.perspective(fovAngle, aspectRatio, nearPlane, farPlane);
