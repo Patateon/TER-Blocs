@@ -165,15 +165,16 @@ void MainWidget::initializeGL()
     ply->loadPlyFile(fileName.toStdString(), currentNuageDePoint);
     ndpComparaison= new NuageDePoint();
     ndpComparaison->clone(ndp);
-    QVector3D target(-1.9f,1.3f, 0.8f);
-    float x,y,z;
-    camera.getPos(x,y,z);
-   // qDebug()<<x<<" "<<y<<" "<<z;
-    //camera.lookAt(target);
-    camera.getPos(x,y,z);
+    // cameraTarget = QVector3D(0.0f, 0.0f, 0.0f);
+    // updateCamera(cameraTarget);
+    // float x,y,z;
+    // camera.getPos(x,y,z);
+    // qDebug()<<x<<" "<<y<<" "<<z;
+    // camera.lookAt(target);
+    // camera.getPos(x,y,z);
    // qDebug()<<x<<" "<<y<<" "<<z;
     camera.apply();
-    camera.getPos(x,y,z);
+    // camera.getPos(x,y,z);
    // qDebug()<<x<<" "<<y<<" "<<z;
 
     // Use QBasicTimer because its faster than QTimer
@@ -250,9 +251,11 @@ void MainWidget::paintGL()
     camera.getPos(x,y,z);
     matrix.translate(x,y,z);
 
+    // Update camera each tick
+    // updateCamera(cameraTarget);
 
     // Set modelview-projection matrix
-    program.setUniformValue("mvp_matrix", camera.getProjectionMatrix() * matrix);
+    program.setUniformValue("mvp_matrix", camera.getProjectionMatrix() /** viewMatrix*/ * matrix);
     //! [6]
 
     // Use texture unit 0 which contains cube.png
@@ -308,4 +311,8 @@ void MainWidget::parseNuageDePoint(){
 void MainWidget::analyseNuageDePoint(){
     currentNuageDePoint->analyseNuageDePoint();
 
+}
+
+void MainWidget::updateCamera(QVector3D target){
+    viewMatrix = camera.lookAt(target);
 }

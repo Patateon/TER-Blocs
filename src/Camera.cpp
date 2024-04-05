@@ -40,30 +40,34 @@ Camera::Camera () {
 }
 
 
-void Camera::lookAt(QVector3D target) {
+QMatrix4x4 Camera::lookAt(QVector3D target) {
     QVector3D cameraPos(x, y, z);
     QVector3D up(0.0f, 1.0f, 0.0f);
 
-    // Calcule la direction de vue
-    QVector3D viewDirection = (target - cameraPos).normalized();
-    qDebug()<<(target - cameraPos);
+    QMatrix4x4 view = QMatrix4x4();
+    view.lookAt(cameraPos, target, up);
+    return view;
 
-    // Calcule la rotation pour faire face au point cible
-    QQuaternion rotation = QQuaternion::rotationTo(QVector3D(0, 0, -1), viewDirection);
+    // // Calcule la direction de vue
+    // QVector3D viewDirection = (target - cameraPos).normalized();
+    // qDebug()<<(target - cameraPos);
 
-    // Applique la rotation à la direction actuelle de la caméra
-    QVector3D rotatedDirection = rotation.rotatedVector(QVector3D(0, 0, -1));
+    // // Calcule la rotation pour faire face au point cible
+    // QQuaternion rotation = QQuaternion::rotationTo(QVector3D(0, 0, -1), viewDirection);
 
-    // Met à jour la position de la caméra pour qu'elle regarde le point cible
-    x = target.x() - rotatedDirection.x();
-    y = target.y() - rotatedDirection.y();
-    z = target.z() - rotatedDirection.z();
+    // // Applique la rotation à la direction actuelle de la caméra
+    // QVector3D rotatedDirection = rotation.rotatedVector(QVector3D(0, 0, -1));
 
-    // Met à jour la rotation de la caméra
-    curquat[0] = rotation.scalar();
-    curquat[1] = rotation.x();
-    curquat[2] = rotation.y();
-    curquat[3] = rotation.z();
+    // // Met à jour la position de la caméra pour qu'elle regarde le point cible
+    // x = target.x() - rotatedDirection.x();
+    // y = target.y() - rotatedDirection.y();
+    // z = target.z() - rotatedDirection.z();
+
+    // // Met à jour la rotation de la caméra
+    // curquat[0] = rotation.scalar();
+    // curquat[1] = rotation.x();
+    // curquat[2] = rotation.y();
+    // curquat[3] = rotation.z();
 }
 
 

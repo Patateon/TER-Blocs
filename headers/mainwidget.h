@@ -44,6 +44,8 @@ protected:
     void parseNuageDePoint();
     void analyseNuageDePoint();
 
+    void updateCamera(QVector3D target);
+
     void initializeGL() override;
     void resizeGL(int w, int h) override;
     void paintGL() override;
@@ -68,6 +70,8 @@ private:
     QOpenGLTexture *texture = nullptr;
 
     Camera camera;
+    QMatrix4x4 viewMatrix;
+    QVector3D cameraTarget;
     static unsigned int SCREENWIDTH ;
     static unsigned int SCREENHEIGHT ;
     static bool mouseRotatePressed ;
