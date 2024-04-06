@@ -58,10 +58,7 @@ RESOURCES += \
 
 INCLUDEPATH += /usr/include
 INCLUDEPATH += $$PWD/ann/include
+INCLUDEPATH += $$PWD/external/CGAL-5.6.1
 
 win32: LIBS += -lopengl32
 unix: LIBS += -lGL -lgmp -lmpfr
-
-
-
-
