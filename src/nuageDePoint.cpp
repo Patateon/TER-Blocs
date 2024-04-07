@@ -1,5 +1,60 @@
 #include "../headers/nuageDePoint.h"
 
+
+Point_3 toPoint_3(const QVector3D& vec) {
+    return Point_3(vec.x(), vec.y(), vec.z());
+}
+
+
+// Fonction pour effectuer la triangulation de Delaunay
+void NuageDePoint::performDelaunayTriangulation(const QVector<QVector3D>& vertices,std::vector<std::vector<int>> triangles) {
+    std::vector<Point_3> points;
+    for(const QVector3D& vertex : vertices) {
+        points.push_back(toPoint_3(vertex));
+    }
+    Delaunay dt;
+    dt.insert(points.begin(), points.end());
+    for (Delaunay::Finite_facets_iterator fit = dt.finite_facets_begin(); fit != dt.finite_facets_end(); ++fit) {
+
+        Point_3 p0 = dt.triangle(*fit).vertex(0);
+        Point_3 p1 = dt.triangle(*fit).vertex(1);
+        Point_3 p2 = dt.triangle(*fit).vertex(2);
+        // Vérifier si un des sommets du triangle est infini
+        if (dt.is_infinite(*fit)) {
+            continue;
+        }
+        else{
+            int index_p0 = -1, index_p1 = -1, index_p2 = -1;
+            for (int i = 0; i < vertices.size(); ++i) {
+                if (vertices[i].x() == CGAL::to_double(p0.x()) &&
+                    vertices[i].y() == CGAL::to_double(p0.y()) &&
+                    vertices[i].z() == CGAL::to_double(p0.z())) {
+                    index_p0 = i;
+                }
+                if (vertices[i].x() == CGAL::to_double(p1.x()) &&
+                    vertices[i].y() == CGAL::to_double(p1.y()) &&
+                    vertices[i].z() == CGAL::to_double(p1.z())) {
+                    index_p1 = i;
+                }
+                if (vertices[i].x() == CGAL::to_double(p2.x()) &&
+                    vertices[i].y() == CGAL::to_double(p2.y()) &&
+                    vertices[i].z() == CGAL::to_double(p2.z())) {
+                    index_p2 = i;
+                }
+            }
+
+
+            std::vector<int> triangleIndices;
+            triangleIndices.push_back(index_p0);
+            triangleIndices.push_back(index_p1);
+            triangleIndices.push_back(index_p2);
+            triangles.push_back(triangleIndices);
+        }
+    }
+}
+
+
+
 float euclidean_distance(const float p1, const float p2) {
     float dr = p1 - p2;
     return sqrt( dr*dr );
@@ -91,6 +146,10 @@ QVector<QVector3D>& NuageDePoint::getColors() {
 
 QVector<QVector3D>& NuageDePoint::getNormals() {
     return normals;
+}
+
+std::vector<std::vector<int>>& NuageDePoint::getTriangles(){
+    return triangles;
 }
 
 QVector<NuageDePoint *> NuageDePoint::parseNuageDePoint() {
@@ -262,6 +321,9 @@ void NuageDePoint::drawGeometry(QOpenGLShaderProgram *program) {
     int normalLocation = program->attributeLocation("normal");
     program->enableAttributeArray(normalLocation);
     program->setAttributeBuffer(normalLocation, GL_FLOAT, 0, 3, sizeof(QVector3D));
+
+    triangleBuf.bind();
+    triangleBuf.allocate(triangles.data(), triangles.size() * sizeof(std::vector<int>));
 
     glDrawArrays(GL_POINTS, 0, vertices.size());
 

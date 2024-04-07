@@ -7,7 +7,6 @@
 #include "plyFile.h"
 #include "Camera.h"
 
-
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
 #include <QMatrix4x4>
@@ -35,7 +34,6 @@ protected:
     void timerEvent(QTimerEvent *e) override;
     void keyReleaseEvent(QKeyEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
-
 
     void saveCurrentNuageDePoint();
     void deleteCurrentNuageDePoint();

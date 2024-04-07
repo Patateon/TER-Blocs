@@ -163,6 +163,7 @@ void MainWidget::initializeGL()
     currentNuageDePoint=ndp;
     ply = new PlyFile();
     ply->loadPlyFile(fileName.toStdString(), currentNuageDePoint);
+    //ndp->performDelaunayTriangulation(ndp->getVertices(),ndp->getTriangles());
     ndpComparaison= new NuageDePoint();
     ndpComparaison->clone(ndp);
     // cameraTarget = QVector3D(0.0f, 0.0f, 0.0f);

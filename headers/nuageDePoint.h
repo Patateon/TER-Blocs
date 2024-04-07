@@ -6,6 +6,12 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLBuffer>
 
+#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
+#include <CGAL/Delaunay_triangulation_3.h>
+typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
+typedef K::Point_3 Point_3;
+typedef CGAL::Delaunay_triangulation_3<K> Delaunay;
+
 using namespace std;
 
 #define DISTANCE_COULEURS 70.0 // entre 0 et 256
@@ -21,13 +27,14 @@ public:
     void clone(NuageDePoint* aCopier);
 
     void drawGeometry(QOpenGLShaderProgram *program);
-
+    void performDelaunayTriangulation(const QVector<QVector3D>& vertices,std::vector<std::vector<int>> triangles);
     void addVertices(QVector3D vertice);
     void addColors(QVector3D color);
     void addNormals(QVector3D normal);
     QVector<QVector3D>& getVertices();
     QVector<QVector3D>& getColors();
     QVector<QVector3D>& getNormals();
+    std::vector<std::vector<int>>& getTriangles();
     void bindAndAllocateBuffer();
     void buildKdtree();
 
@@ -43,10 +50,13 @@ private:
     QVector<QVector3D> vertices;
     QVector<QVector3D> colors;
     QVector<QVector3D> normals;
+    std::vector<std::vector<int>> triangles;
+
 
     QOpenGLBuffer arrayBuf;
     QOpenGLBuffer colorBuf;
     QOpenGLBuffer normalBuf;
+    QOpenGLBuffer triangleBuf;
 };
 
 #endif // NuageDePoint_H
