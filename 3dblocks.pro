@@ -54,6 +54,7 @@ HEADERS += \
 RESOURCES += \
     shaders/fshader.glsl \
     shaders/vshader.glsl \
+    shaders/gshader.glsl \
     data/meshcolor.ply \
 
 INCLUDEPATH += /usr/include
@@ -62,3 +63,6 @@ INCLUDEPATH += $$PWD/external/CGAL-5.6.1
 
 win32: LIBS += -lopengl32
 unix: LIBS += -lGL -lgmp -lmpfr
+
+DISTFILES += \
+    shaders/gshader.glsl

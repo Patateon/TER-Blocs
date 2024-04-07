@@ -19,6 +19,14 @@ using namespace std;
 #define NBPOINTSMIN 1000
 #define DISTANCE_COULEURS_DOMINANTE 0.15 // entre 0 et 1
 
+enum class Descripteur {
+    Graton,
+    Plat,
+    Slopers,
+    Trou,
+    Regle
+};
+
 class NuageDePoint
 {
 public:
@@ -44,6 +52,10 @@ public:
     void analyseNuageDePoint();
     void clearNuageDePoint();
 
+    void setDescripteur(Descripteur desc) { descripteur = desc; }
+
+    Descripteur getDescripteur() const { return descripteur; }
+
 private:
     BasicANNkdTree kdtree;
 
@@ -57,6 +69,8 @@ private:
     QOpenGLBuffer colorBuf;
     QOpenGLBuffer normalBuf;
     QOpenGLBuffer triangleBuf;
+
+    Descripteur descripteur;
 };
 
 #endif // NuageDePoint_H

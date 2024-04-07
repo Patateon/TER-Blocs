@@ -1,22 +1,24 @@
-#ifdef GL_ES
-// Set default precision to medium
-precision mediump int;
-precision mediump float;
-#endif
+#version 330 core // Use GLSL version 3.30 core profile
 
+// Input attributes
+in vec3 vertex;
+in vec3 color;
+in vec3 normal;
+
+// Output varying variables to geometry shader
+out vec3 vColor;
+out vec3 vNormal;
+out vec3 vPosition;
+
+// Uniform matrix
 uniform mat4 mvp_matrix;
 
-attribute vec3 vertex;
-attribute vec3 color;
-attribute vec3 normal;
-varying vec3 vColor;
-varying vec3 vNormal;
-varying vec3 vPosition;
-
 void main() {
-    gl_Position = mvp_matrix * vec4(vertex, 1.0);
-    vPosition= vec3(gl_Position);
+    // Pass vertex attributes to geometry shader
     vColor = color;
     vNormal = normal;
+    vPosition = vertex;
+
+    // Transform vertex position
+    gl_Position = mvp_matrix * vec4(vertex, 1.0);
 }
-//! [0]

@@ -187,6 +187,10 @@ void MainWidget::initShaders()
 {
     // Compile vertex shader
     if (!program.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/vshader.glsl"))
+       close();
+
+    // Compile geometry shader
+    if (!program.addShaderFromSourceFile(QOpenGLShader::Geometry, ":/shaders/gshader.glsl"))
         close();
 
     // Compile fragment shader
@@ -238,7 +242,7 @@ void MainWidget::paintGL()
     //glEnable(GL_DEPTH_TEST);
 
     // Enable back face culling
-    //glEnable(GL_CULL_FACE);
+    glEnable(GL_CULL_FACE);
     //! [2]
 
     texture->bind();
@@ -257,12 +261,19 @@ void MainWidget::paintGL()
 
     // Set modelview-projection matrix
     program.setUniformValue("mvp_matrix", camera.getProjectionMatrix() /** viewMatrix*/ * matrix);
+    program.setUniformValue("cameraPosition", QVector3D(x, y, z));
     //! [6]
 
     // Use texture unit 0 which contains cube.png
     //program.setUniformValue("texture", 0);
 
     // Draw nuage de point
+    // Enable point size for rendering points
+    glEnable(GL_PROGRAM_POINT_SIZE);
+
+    // Set the desired point size
+    float pointSize = 5.0f; // Set your desired point size here
+    glPointSize(pointSize);
     currentNuageDePoint->drawGeometry(&program);
     if(afficher_ndpComparaison){ndpComparaison->drawGeometry(&program);}
 }
