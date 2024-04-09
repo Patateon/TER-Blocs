@@ -12,6 +12,7 @@ int MainWidget::lastX = 0;
 int MainWidget::lastY = 0;
 int MainWidget::lastZoom = 0;
 bool MainWidget::fullScreen = false;
+bool MainWidget::mainCamera = true;
 
 MainWidget::~MainWidget()
 {
@@ -63,7 +64,7 @@ void MainWidget::mouseMoveEvent(QMouseEvent *event)
         camera.rotate(x, y);
     }
     else if (mouseMovePressed) {
-        camera.move((x - lastX) / static_cast<float>(SCREENWIDTH), (lastY - y) / static_cast<float>(SCREENHEIGHT), 0.0);
+        camera.move((x - lastX) / static_cast<float>(SCREENWIDTH), -(lastY - y) / static_cast<float>(SCREENHEIGHT), 0.0);
         lastX = x;
         lastY = y;
     }
@@ -87,6 +88,9 @@ void MainWidget::mouseReleaseEvent(QMouseEvent *e)
     QOpenGLWidget::mouseReleaseEvent(e);
 }
 
+// void MainWidget::wheelEvent(QWheelEvent * event){
+
+// }
 
 void MainWidget::keyPressEvent(QKeyEvent *event)
 {
@@ -121,17 +125,14 @@ void MainWidget::keyReleaseEvent(QKeyEvent *event)
         afficher_ndpComparaison=!afficher_ndpComparaison;
         update();
         break;
+    case Qt::Key_S:
+        mainCamera = !mainCamera;
+        break;
     default:
         QOpenGLWidget::keyReleaseEvent(event);
         break;
     }
 }
-
-
-
-
-
-
 //! [0]
 
 //! [1]
@@ -166,17 +167,23 @@ void MainWidget::initializeGL()
     //ndp->performDelaunayTriangulation(ndp->getVertices(),ndp->getTriangles());
     ndpComparaison= new NuageDePoint();
     ndpComparaison->clone(ndp);
-    // cameraTarget = QVector3D(0.0f, 0.0f, 0.0f);
+
+
+    currentNuageDePoint->computeBarycentre();
+    cameraTarget = currentNuageDePoint->getBarycentre();
+    qDebug()<<"Barycentre du ndg courant : "<<cameraTarget;
+
+    camera.initPos();
     // updateCamera(cameraTarget);
     // float x,y,z;
     // camera.getPos(x,y,z);
     // qDebug()<<x<<" "<<y<<" "<<z;
     // camera.lookAt(target);
     // camera.getPos(x,y,z);
-   // qDebug()<<x<<" "<<y<<" "<<z;
-    camera.apply();
+    // qDebug()<<x<<" "<<y<<" "<<z;
+    // camera.apply();
     // camera.getPos(x,y,z);
-   // qDebug()<<x<<" "<<y<<" "<<z;
+    // qDebug()<<x<<" "<<y<<" "<<z;
 
     // Use QBasicTimer because its faster than QTimer
     timer.start(12, this);
@@ -229,6 +236,7 @@ void MainWidget::initTextures()
 void MainWidget::resizeGL(int w, int h)
 {
     camera.resize (w, h);
+    projectionMatrix = camera.getProjectionMatrix();
 }
 //! [5]
 
@@ -248,19 +256,24 @@ void MainWidget::paintGL()
     texture->bind();
     program.bind();
 
+    // Get camera position for view matrix computation and for lightnings computations
+    float x,y,z;
+    camera.getPos(x,y,z);
 
     //! [6]
     // Calculate model view transformation
-    QMatrix4x4 matrix;
-    float x,y,z;
-    camera.getPos(x,y,z);
-    matrix.translate(x,y,z);
+    QMatrix4x4 modelMatrix;
 
-    // Update camera each tick
-    // updateCamera(cameraTarget);
+    // Compute view matrix
+    viewMatrix = QMatrix4x4();
+    if (mainCamera){
+        viewMatrix.lookAt(QVector3D(x, y, z), cameraTarget, QVector3D(0.0, 1.0, 0.0));
+    }else{
+        viewMatrix.lookAt(QVector3D(x, y, z), cameraTarget2, QVector3D(0.0, 1.0, 0.0));
+    }
 
     // Set modelview-projection matrix
-    program.setUniformValue("mvp_matrix", camera.getProjectionMatrix() /** viewMatrix*/ * matrix);
+    program.setUniformValue("mvp_matrix", projectionMatrix * viewMatrix * modelMatrix);
     program.setUniformValue("cameraPosition", QVector3D(x, y, z));
     //! [6]
 
@@ -310,12 +323,14 @@ void MainWidget::switchNuageDePoint(){
     currentNuageDePoint = allNuageDePoint[nextNuageDePointIndice];
     currentNuageDePoint->bindAndAllocateBuffer();
     nextNuageDePointIndice++;
+    cameraTarget2 = currentNuageDePoint->getBarycentre();
     update();
 }
 
 void MainWidget::parseNuageDePoint(){
     QVector<NuageDePoint *> NuageDePointSupplementaire = currentNuageDePoint->parseNuageDePoint();
     for(NuageDePoint* ndp : NuageDePointSupplementaire) {
+        ndp->computeBarycentre();
         allNuageDePoint.append( ndp );
     }
 }
@@ -323,8 +338,4 @@ void MainWidget::parseNuageDePoint(){
 void MainWidget::analyseNuageDePoint(){
     currentNuageDePoint->analyseNuageDePoint();
 
-}
-
-void MainWidget::updateCamera(QVector3D target){
-    viewMatrix = camera.lookAt(target);
 }

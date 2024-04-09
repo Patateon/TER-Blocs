@@ -5,7 +5,6 @@ Point_3 toPoint_3(const QVector3D& vec) {
     return Point_3(vec.x(), vec.y(), vec.z());
 }
 
-
 // Fonction pour effectuer la triangulation de Delaunay
 void NuageDePoint::performDelaunayTriangulation(const QVector<QVector3D>& vertices,std::vector<std::vector<int>> triangles) {
     std::vector<Point_3> points;
@@ -53,8 +52,6 @@ void NuageDePoint::performDelaunayTriangulation(const QVector<QVector3D>& vertic
     }
 }
 
-
-
 float euclidean_distance(const float p1, const float p2) {
     float dr = p1 - p2;
     return sqrt( dr*dr );
@@ -66,7 +63,6 @@ float euclidean_distance(const QVector3D& p1, const QVector3D& p2) {
     float diffB = p1.z() - p2.z();
     return sqrt(diffR * diffR + diffG * diffG + diffB * diffB);
 }
-
 
 struct QVector3DComparer {
     bool operator()(const QVector3D& c1, const QVector3D& c2) const {
@@ -117,12 +113,12 @@ NuageDePoint::NuageDePoint() {
     colorBuf.create();
     normalBuf.create();
 }
+
 NuageDePoint::~NuageDePoint() {
     arrayBuf.destroy();
     colorBuf.destroy();
     normalBuf.destroy();
 }
-
 
 void NuageDePoint::addVertices(QVector3D vertice){
     vertices.append(vertice);
@@ -286,6 +282,7 @@ void NuageDePoint::clone( NuageDePoint* aCopier) {
 
     (this)->bindAndAllocateBuffer();
 }
+
 void NuageDePoint::buildKdtree(){
 
     vector<QVector3D> verticesVectorVec3;
@@ -303,7 +300,6 @@ void NuageDePoint::bindAndAllocateBuffer(){
     normalBuf.bind();
     normalBuf.allocate(normals.data(), normals.size() * sizeof(QVector3D));
 }
-
 
 void NuageDePoint::drawGeometry(QOpenGLShaderProgram *program) {
 
@@ -331,4 +327,18 @@ void NuageDePoint::drawGeometry(QOpenGLShaderProgram *program) {
     program->disableAttributeArray(vertexLocation);
     program->disableAttributeArray(colorLocation);
     program->disableAttributeArray(normalLocation);
+}
+
+void NuageDePoint::computeBarycentre() {
+    QVector3D tmp = QVector3D();
+    int vertices_size = this->vertices.size();
+    for(int i = 0; i < vertices_size; i++){
+        tmp += this->vertices[i];
+    }
+    tmp *= (1.f / (float) vertices_size);
+    barycentre = tmp;
+}
+
+QVector3D NuageDePoint::getBarycentre() {
+    return barycentre;
 }

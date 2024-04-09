@@ -175,12 +175,12 @@ void Camera::zoom (float z) {
 
 
 void Camera::apply () {
-  glLoadIdentity();
-  glTranslatef (x, y, z);
-  GLfloat m[4][4];
-  build_rotmatrix(m, curquat);
-  glTranslatef (0.0, 0.0, -_zoom);
-  glMultMatrixf(&m[0][0]);
+    glLoadIdentity();
+    glTranslatef (x, y, z);
+    GLfloat m[4][4];
+    build_rotmatrix(m, curquat);
+    glTranslatef (0.0, 0.0, -_zoom);
+    glMultMatrixf(&m[0][0]);
 }
 
 
