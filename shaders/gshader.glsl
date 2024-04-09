@@ -17,7 +17,7 @@ out vec3 gPosition;
 
 // Définir le nombre de segments pour le disque
 const int NUM_SEGMENTS = 3;
-const float DISK_RADIUS = 0.01; // Rayon du disque
+const float DISK_RADIUS = 0.008; // Rayon du disque
 
 void main() {
     vec3 center = vPosition[0]; // Centre du disque

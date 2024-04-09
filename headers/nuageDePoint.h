@@ -1,6 +1,8 @@
 #ifndef NuageDePoint_H
 #define NuageDePoint_H
 
+#include <random>
+
 #include "kdtree.h"
 #include <vector>
 #include <QOpenGLShaderProgram>
@@ -11,6 +13,28 @@
 typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
 typedef K::Point_3 Point_3;
 typedef CGAL::Delaunay_triangulation_3<K> Delaunay;
+
+#include <CGAL/property_map.h>
+#include <CGAL/IO/read_points.h>
+#include <CGAL/Point_with_normal_3.h>
+#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
+#include <CGAL/Shape_detection/Efficient_RANSAC.h>
+
+// Type declarations.
+typedef CGAL::Exact_predicates_inexact_constructions_kernel  Kernel;
+typedef std::pair<Kernel::Point_3, Kernel::Vector_3>         Point_with_normal;
+typedef std::vector<Point_with_normal>                       Pwn_vector;
+typedef CGAL::First_of_pair_property_map<Point_with_normal>  Point_map;
+typedef CGAL::Second_of_pair_property_map<Point_with_normal> Normal_map;
+typedef CGAL::Shape_detection::Efficient_RANSAC_traits
+    <Kernel, Pwn_vector, Point_map, Normal_map>             Traits;
+typedef CGAL::Shape_detection::Efficient_RANSAC<Traits> Efficient_ransac;
+typedef CGAL::Shape_detection::Plane<Traits>            Plane;
+typedef CGAL::Shape_detection::Cone<Traits>             Cone;
+typedef CGAL::Shape_detection::Cylinder<Traits>         Cylinder;
+typedef CGAL::Shape_detection::Sphere<Traits>           Sphere;
+typedef CGAL::Shape_detection::Torus<Traits>            Torus;
+
 
 using namespace std;
 

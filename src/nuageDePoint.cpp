@@ -4,7 +4,47 @@
 Point_3 toPoint_3(const QVector3D& vec) {
     return Point_3(vec.x(), vec.y(), vec.z());
 }
+QVector3D generate_unique_color(const std::vector<QVector3D>& couleurs) {
+    // Générateur de nombres aléatoires
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<float> dist(0.0f, 1.0f);
 
+    // Générer une couleur unique RVB
+    QVector3D color;
+    bool unique = false;
+    while (!unique) {
+        // Générer des valeurs RVB aléatoires
+        float r = dist(gen);
+        float g = dist(gen);
+        float b = dist(gen);
+
+        // Vérifier si la couleur est unique
+        unique = true;
+        for (const auto& c : couleurs) {
+            float dr = c.x() - r;
+            float dg = c.y() - g;
+            float db = c.z() - b;
+            // Calculer la distance euclidienne entre la nouvelle couleur et les couleurs existantes
+            float distance = std::sqrt(dr * dr + dg * dg + db * db);
+            // Si la distance est inférieure à une certaine valeur, la couleur n'est pas unique
+            if (distance < 0.15f) { // Changer cette valeur selon vos besoins
+                unique = false;
+                break;
+            }
+        }
+
+        // Si la couleur est unique, l'ajouter à la liste et sortir de la boucle
+        if (unique) {
+            color.setX(r);
+            color.setY(g);
+            color.setZ(b);
+            break;
+        }
+    }
+
+    return color;
+}
 
 // Fonction pour effectuer la triangulation de Delaunay
 void NuageDePoint::performDelaunayTriangulation(const QVector<QVector3D>& vertices,std::vector<std::vector<int>> triangles) {
@@ -198,7 +238,7 @@ float dotProduct(const QVector3D& v1, const QVector3D& v2) {
 }
 
 void NuageDePoint::analyseNuageDePoint(){
-    QVector3D moyNormals;
+/*    QVector3D moyNormals;
     QVector3D moyPositions;
     float moyDotProductNormals=0;
     // int nbDotProductSupA075=0;
@@ -259,7 +299,68 @@ void NuageDePoint::analyseNuageDePoint(){
     qDebug() << " Nombre de DP >= -0.5 & < 0.5 : " << nbDotProductInfA05SupAMinus05;
     qDebug() << " Nombre de DP < -0.5 : " << nbDotProductInfAMinus05;
     qDebug() << " Trou? : " << trou << "Contour externe : " << pasTrou;
+*/
+    Pwn_vector points;
+for(int i=0;i<vertices.size();i++) {
+     points.push_back(std::make_pair(Kernel::Point_3(vertices[i].x(),vertices[i].y(), vertices[i].z()), Kernel::Vector_3(normals[i].x(), normals[i].y(), normals[i].z())));
+    }
+    // Instantiate shape detection engine.
+    Efficient_ransac ransac;
+    // Provide input data.
+    ransac.set_input(points);
+    // Register planar shapes via template method.
+    ransac.add_shape_factory<Plane>();
+    // Register spherical shapes via template method
+    ransac.add_shape_factory<Sphere>();
+    ransac.add_shape_factory<Cone>();
+    ransac.add_shape_factory<Cylinder>();
+    ransac.add_shape_factory<Sphere>();
+    ransac.add_shape_factory<Torus>();
+    // Detect registered shapes with default parameters.
+    ransac.detect();
+    // Print number of detected shapes.
+    std::cout << ransac.shapes().end() - ransac.shapes().begin()
+              << " shapes detected." << std::endl;
 
+    // Récupérer les formes détectées
+    const auto& detected_shapes = ransac.shapes();
+
+    // Créer une couleur unique pour chaque forme
+    std::vector<QVector3D> colorsShape;
+    for (int i = 0; i < detected_shapes.size(); i++) {
+        // Générer une couleur unique (par exemple, en utilisant des valeurs RGB aléatoires)
+        colorsShape.push_back(generate_unique_color(colorsShape));
+    }
+    int c= 0;
+    Efficient_ransac::Shape_range::iterator it = ransac.shapes().begin();
+    vertices.clear();normals.clear();colors.clear();
+    while (it != ransac.shapes().end()) {
+        // Récupérer la forme détectée
+        boost::shared_ptr<Efficient_ransac::Shape> shape = *it;
+
+        // Utiliser Shape_base::info() pour imprimer les paramètres de la forme détectée
+        std::cout << (*it)->info();
+
+
+
+        // Itérer à travers les indices de points assignés à chaque forme détectée
+        std::vector<std::size_t>::const_iterator index_it = (*it)->indices_of_assigned_points().begin();
+        while (index_it != (*it)->indices_of_assigned_points().end()) {
+            // Récupérer le point avec normale à partir de votre propre nuage de points
+            const Point_with_normal& p = points[*index_it]; // Supposant que 'points' est votre nuage de points avec normales
+            // Dessinez ou utilisez les points avec leur couleur attribuée (par exemple, pour la visualisation)
+            // Ajouter le point avec sa normale à vos vecteurs de vertices et de normals
+            QVector3D vertex(p.first.x(), p.first.y(), p.first.z());
+            QVector3D normal(p.second.x(), p.second.y(), p.second.z());
+            vertices.push_back(vertex);
+            normals.push_back(normal);
+            colors.push_back(colorsShape[c]);
+
+            index_it++;
+        }
+
+        it++;c++;std::cout<<std::endl;
+    }
 }
 
 void NuageDePoint::clearNuageDePoint() {
