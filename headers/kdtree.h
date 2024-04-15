@@ -95,10 +95,7 @@ public:
         ann_point[0]=i_position.x();
         ann_point[1]=i_position.y();
         ann_point[2]=i_position.z();
-        std::cout<<ann_point[0]<<" "<<ann_point[1]<<" "<<ann_point[2]<<std::endl;
-        std::cout<<"juan"<<std::endl;
         ANNtree->annkSearch( ann_point , k , id_nearest_neighbors , square_distances_to_neighbors );
-        std::cout<<"juan2"<<std::endl;
         annDeallocPt(ann_point);
     }
 };

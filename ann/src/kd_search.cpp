@@ -93,7 +93,6 @@ void ANNkd_tree::annkSearch(
 	ANNdistArray		dd,				// the approximate nearest neighbor
 	double				eps)			// the error bound
 {
-    std::cout<<"dans annksearch"<<std::endl;
 	ANNkdDim = dim;						// copy arguments to static equivs
 	ANNkdQ = q;
 	ANNkdPts = pts;
@@ -108,9 +107,7 @@ void ANNkd_tree::annkSearch(
 
 	ANNkdPointMK = new ANNmin_k(k);		// create set for closest k points
 										// search starting at the root
-    std::cout<<"avant ann_search"<<std::endl;
 	root->ann_search(annBoxDistance(q, bnd_box_lo, bnd_box_hi, dim));
-    std::cout<<"apres ann_search"<<std::endl;
 	for (int i = 0; i < k; i++) {		// extract the k-th closest points
 		dd[i] = ANNkdPointMK->ith_smallest_key(i);
 		nn_idx[i] = ANNkdPointMK->ith_smallest_info(i);

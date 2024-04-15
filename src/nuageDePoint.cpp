@@ -296,11 +296,12 @@ QVector<QVector3D> initializeCentroidsKMeansPlusPlus(const QVector<QVector3D>& p
 
 
 QVector<NuageDePoint*> NuageDePoint::parseNDP() {
+    buildKdtree();
     QVector<NuageDePoint*> allNDP;
     float seuilDistance=DISTANCE_XYZ;
     float seuilCouleur=DISTANCE_COULEURS;
     // Nombre de clusters (k)
-    int k = 20; // Vous pouvez modifier ce nombre selon vos besoins
+    int k = 40; // Vous pouvez modifier ce nombre selon vos besoins
     QVector<QVector3D> centroidColors;
     QVector<QVector3D> centroids=initializeCentroidsKMeansPlusPlus(vertices,colors,k,centroidColors);
 
@@ -316,14 +317,12 @@ QVector<NuageDePoint*> NuageDePoint::parseNDP() {
         std::vector<int> mark(getVertices().size(), 0);
         std::vector<int> classe(getVertices().size(), -1);
         std::vector<float> dist(getVertices().size(),FLT_MAX);
-        int nbVoisin=2000;
+        int nbVoisin=5000;
         // On récupère les voisins de chaque centroide et on stock leur distance minimale a un centroide
         for (int i = 0; i < k; ++i) {
             ANNidxArray id_nearest_neighbors = new ANNidx[ nbVoisin ];
             ANNdistArray square_distances_to_neighbors = new ANNdist[ nbVoisin ];
-            qDebug()<<"avant knearest";
             kdtree.knearest(centroids[i],nbVoisin,id_nearest_neighbors,square_distances_to_neighbors);
-            qDebug()<<"apres knearest";
             //On récupère les distances et on attribue les classes
             for(int j=0;j<nbVoisin;j++){
                 int ind=id_nearest_neighbors[j];
@@ -336,7 +335,6 @@ QVector<NuageDePoint*> NuageDePoint::parseNDP() {
             delete [] id_nearest_neighbors;
             delete [] square_distances_to_neighbors;
         }
-        qDebug()<<"oulala";
         // Assigner les classes
         for(int i=0;i<classe.size();i++){
             if(classe[i]!=-1){
@@ -356,12 +354,12 @@ QVector<NuageDePoint*> NuageDePoint::parseNDP() {
             }
         }
         //Ajout de centroide
-        float add=false;
-        int seuilNbNonAssignes=vertices.size()/5;
+        bool add=false;
+        int seuilNbNonAssignes=vertices.size()/4;
         int nbNonAssignes=0;
         std::vector<int> indiceNonAssignes;
         for(int i=0;i<mark.size();i++){
-            if(mark[i]==1) {
+            if(mark[i]==0) {
                 nbNonAssignes++;
                 indiceNonAssignes.push_back((i));
             }
@@ -370,27 +368,30 @@ QVector<NuageDePoint*> NuageDePoint::parseNDP() {
             add=true;
             k++;
         }
-        qDebug()<<nbNonAssignes;
-        clusters.resize(k);
-        colors_.resize(k);
-        normals_.resize(k);
-        centroidColors.resize(k);
-        centroids.resize((k));
-        oldCentroids.resize(k);
+        //qDebug()<<"nn assignes"<<nbNonAssignes<<"k "<<k;
         QVector<QVector3D> sommetNonAssignes;
         if(add){
             for(int i=0;i<indiceNonAssignes.size();i++){
                 sommetNonAssignes.push_back(vertices[indiceNonAssignes[i]]);
             }
         }
+        centroidColors.resize(k);
+        centroids.resize((k));
+        oldCentroids.resize(k);
         int randomIndex = rand() % sommetNonAssignes.size();
-        centroids.push_back(vertices[indiceNonAssignes[randomIndex]]);
-        oldCentroids.push_back(vertices[indiceNonAssignes[randomIndex]]);
-        centroidColors.push_back(colors[indiceNonAssignes[randomIndex]]);
+        if(add){
+            centroids.push_back(vertices[indiceNonAssignes[randomIndex]]);
+            oldCentroids.push_back(vertices[indiceNonAssignes[randomIndex]]);
+            centroidColors.push_back(colors[indiceNonAssignes[randomIndex]]);
+        }
+        clusters.resize(k);
+        colors_.resize(k);
+        normals_.resize(k);
         //Verification convergence sur nombre de changement de classe si on ajoute pas de centroide
-        if(!add){
-            int seuilConvergence=2000;
-            int nbChangementClasse=0;
+        int seuilConvergence=5000;
+        int nbChangementClasse=0;
+        qDebug()<<k;
+        if(!add||k>60){
             for(int i=0;i<centroids.size();i++){
                 if(oldCentroids[i]!=centroids[i]){
                     nbChangementClasse++;
@@ -407,8 +408,16 @@ QVector<NuageDePoint*> NuageDePoint::parseNDP() {
                 }
             }
         }
-    }
+        else{
+            for(int i=0;i<clusters.size();i++){
+                clusters[i].clear();
+                colors_[i].clear();
+                normals_[i].clear();
+            }
+        }
 
+
+    }
     // Créer les sous-meshes à partir des clusters
     for (int i = 0; i < k; ++i) {
         // Vérifier si le cluster n'est pas vide
@@ -418,7 +427,7 @@ QVector<NuageDePoint*> NuageDePoint::parseNDP() {
             for (int j = 0; j < clusters[i].size(); ++j) {
                 sousNDP->addVertices(clusters[i][j]);
                 sousNDP->addColors(colors_[i][j]);
-                sousNDP->addNormals(normals_[i][j]);
+                //sousNDP->addNormals(normals_[i][j]);
             }
             qDebug() << "Taille sous mesh" << sousNDP->getVertices().size();
             if(sousNDP->getVertices().size()<NBPOINTSMAX && sousNDP->getVertices().size()>NBPOINTSMIN){
