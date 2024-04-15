@@ -371,7 +371,6 @@ QVector<NuageDePoint*> NuageDePoint::parseNDP() {
         }
         if(nbNonAssignes>seuilNbNonAssignes){
             add=true;
-            k++;
         }
         //qDebug()<<"nn assignes"<<nbNonAssignes<<"k "<<k;
         QVector<QVector3D> sommetNonAssignes;
@@ -380,9 +379,6 @@ QVector<NuageDePoint*> NuageDePoint::parseNDP() {
                 sommetNonAssignes.push_back(vertices[indiceNonAssignes[i]]);
             }
         }
-        centroidColors.resize(k);
-        centroids.resize((k));
-        oldCentroids.resize(k);
         //Verification convergence sur nombre de changement de classe si on ajoute pas de centroide
         int seuilConvergence=15;
         int nbChangementCentroide=0;
@@ -399,15 +395,18 @@ QVector<NuageDePoint*> NuageDePoint::parseNDP() {
         }
         else{
             if(add){
+                k++;
+                centroidColors.resize(k);
+                centroids.resize((k));
+                oldCentroids.resize(k);
+                clusters.resize(k);
+                colors_.resize(k);
+                normals_.resize(k);
                 int randomIndex = rand() % sommetNonAssignes.size();
-                qDebug()<<randomIndex<<" "<<indiceNonAssignes.size();
                 centroids.push_back(vertices[indiceNonAssignes[randomIndex]]);
                 oldCentroids.push_back(vertices[indiceNonAssignes[randomIndex]]);
                 centroidColors.push_back(colors[indiceNonAssignes[randomIndex]]);
             }
-            clusters.resize(k);
-            colors_.resize(k);
-            normals_.resize(k);
             for(int i=0;i<clusters.size();i++){
                 clusters[i].clear();
                 colors_[i].clear();
@@ -428,6 +427,7 @@ QVector<NuageDePoint*> NuageDePoint::parseNDP() {
     }
     // Créer les sous-meshes à partir des clusters
     for (int i = 0; i < k; ++i) {
+        qDebug()<<i<<clusters.size();
         // Vérifier si le cluster n'est pas vide
         if (!clusters[i].isEmpty()) {
             NuageDePoint* sousNDP = new NuageDePoint();
