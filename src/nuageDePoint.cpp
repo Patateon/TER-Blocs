@@ -294,43 +294,16 @@ QVector<QVector3D> initializeCentroidsKMeansPlusPlus(const QVector<QVector3D>& p
 }
 
 
-QVector3D calculateRandomAverage(const QVector<QVector3D>& vertices,const QVector<QVector3D>& colors, const std::vector<int>& indiceNmarque, int nbsom,QVector3D &color) {
-    srand(time(NULL));
-    if (nbsom <= 0 || nbsom > indiceNmarque.size()) {
-        std::cerr << "Nombre de sommets à sélectionner incorrect" << std::endl;
-        return QVector3D();
-    }
-    QVector3D sum(0,0,0);
-    QVector3D sumColor(0,0,0);
-    //selectionne aleatoirement les sommets a sommer
-    for (int i = 0; i < nbsom; ++i) {
-        int randomIndex = rand() % indiceNmarque.size();
-        sum += vertices[indiceNmarque[randomIndex]];
-        sumColor+=colors[indiceNmarque[randomIndex]];
-    }
-    sumColor/=nbsom;
-    color=sumColor;
-    return sum / nbsom;
-}
 
 QVector<NuageDePoint*> NuageDePoint::parseNDP() {
     QVector<NuageDePoint*> allNDP;
     float seuilDistance=DISTANCE_XYZ;
     float seuilCouleur=DISTANCE_COULEURS;
     // Nombre de clusters (k)
-    int k = 60; // Vous pouvez modifier ce nombre selon vos besoins
-
-    // Initialisation aléatoire des centroïdes
+    int k = 20; // Vous pouvez modifier ce nombre selon vos besoins
     QVector<QVector3D> centroidColors;
     QVector<QVector3D> centroids=initializeCentroidsKMeansPlusPlus(vertices,colors,k,centroidColors);
 
-    /*
-    srand(time(NULL)); // Initialisation du générateur de nombres aléatoires
-    for (int i = 0; i < k; ++i) {
-        int index = rand() % vertices.size(); // Sélection aléatoire d'un point comme centroïde initial
-        centroids.push_back(vertices[index]);
-        centroidColors.push_back(colors[index]);
-    }*/
     // Initialisation des clusters
     QVector<QVector<QVector3D>> clusters(k);
     QVector<QVector<QVector3D>> colors_(k);
@@ -338,31 +311,42 @@ QVector<NuageDePoint*> NuageDePoint::parseNDP() {
 
     // Algorithme K-means
     bool converged = false;
+    qDebug()<<"Entree boucle";
     while (!converged) {
         std::vector<int> mark(getVertices().size(), 0);
-        // Assigner chaque point au cluster le plus proche
-        for (int i = 0; i < vertices.size(); ++i) {
-            float minDistanceSpatiale = std::numeric_limits<float>::max();
-            float minDistanceCouleur = std::numeric_limits<float>::max();
-            int closestCluster = -1;
-            for (int j = 0; j < k; ++j) {
-                float distanceCouleur=euclidean_distance(colors[i],centroidColors[j]);
-                float distanceSpatiale = euclidean_distance(vertices[i], centroids[j]);
-                if (distanceSpatiale < minDistanceSpatiale&&distanceCouleur<minDistanceCouleur) {
-                    minDistanceSpatiale = distanceSpatiale;
-                    minDistanceCouleur = distanceCouleur;
-                    closestCluster = j;
+        std::vector<int> classe(getVertices().size(), -1);
+        std::vector<float> dist(getVertices().size(),FLT_MAX);
+        int nbVoisin=2000;
+        // On récupère les voisins de chaque centroide et on stock leur distance minimale a un centroide
+        for (int i = 0; i < k; ++i) {
+            ANNidxArray id_nearest_neighbors = new ANNidx[ nbVoisin ];
+            ANNdistArray square_distances_to_neighbors = new ANNdist[ nbVoisin ];
+            qDebug()<<"avant knearest";
+            kdtree.knearest(centroids[i],nbVoisin,id_nearest_neighbors,square_distances_to_neighbors);
+            qDebug()<<"apres knearest";
+            //On récupère les distances et on attribue les classes
+            for(int j=0;j<nbVoisin;j++){
+                int ind=id_nearest_neighbors[j];
+                float distance=square_distances_to_neighbors[j];
+                if(distance<dist[ind]&&distance<seuilDistance){
+                    dist[ind]=distance;
+                    classe[ind]=i;
                 }
             }
-            if (minDistanceCouleur < seuilCouleur/256.0&&minDistanceSpatiale<seuilDistance) { // Vérifiez si la distance est inférieure au seuil
+            delete [] id_nearest_neighbors;
+            delete [] square_distances_to_neighbors;
+        }
+        qDebug()<<"oulala";
+        // Assigner les classes
+        for(int i=0;i<classe.size();i++){
+            if(classe[i]!=-1){
+                clusters[classe[i]].push_back(vertices[i]);
+                colors_[classe[i]].push_back(colors[i]);
                 mark[i]=1;
-                clusters[closestCluster].push_back(vertices[i]);
-                colors_[closestCluster].push_back(colors[i]);
-                normals_[closestCluster].push_back(normals[i]);
             }
         }
-        // Mettre à jour les centroïdes
-
+        //Maj centroide
+        QVector<QVector3D> oldCentroids=centroids;
         centroids.clear();
         centroidColors.clear();
         for (int i = 0; i < k; ++i) {
@@ -371,86 +355,58 @@ QVector<NuageDePoint*> NuageDePoint::parseNDP() {
                 centroidColors.push_back(updateCentroidColors(colors_[i]));
             }
         }
-        QVector<QVector3D> oldCentroids = centroids;
-        //ajout centroides nécessaires si des sommets pas marqués
-        bool add=false;
-        int m=0;
+        //Ajout de centroide
+        float add=false;
+        int seuilNbNonAssignes=vertices.size()/5;
+        int nbNonAssignes=0;
+        std::vector<int> indiceNonAssignes;
         for(int i=0;i<mark.size();i++){
-            if(mark[i]==0){
-                m++;
-                if(add==false)
-                {
-                    add=true;
-                    k++;
-                }
+            if(mark[i]==1) {
+                nbNonAssignes++;
+                indiceNonAssignes.push_back((i));
             }
         }
-        //création liste d'indice de sommet non marqués
-        std::vector<int> indiceNmarque;
-        for(int i=0;i<mark.size();i++){
-            if(mark[i]==0) indiceNmarque.push_back(i);
+        if(nbNonAssignes>seuilNbNonAssignes){
+            add=true;
+            k++;
         }
-        //int nbsom=m/4;
-        int randomIndex = rand() % indiceNmarque.size();
-        //QVector3D addColorCentroide;
-        //QVector3D addCentroide=calculateRandomAverage(vertices,colors,indiceNmarque,nbsom,addColorCentroide);
-        centroids.push_back(vertices[indiceNmarque[randomIndex]]);
-        oldCentroids.push_back(vertices[indiceNmarque[randomIndex]]);
-        centroidColors.push_back(colors[indiceNmarque[randomIndex]]);
+        qDebug()<<nbNonAssignes;
         clusters.resize(k);
         colors_.resize(k);
         normals_.resize(k);
         centroidColors.resize(k);
         centroids.resize((k));
         oldCentroids.resize(k);
-        // Calcul de la moyenne des points non attribués
-        /*
-        QVector3D averageUnassignedPoint(0,0,0);
-        QVector3D averageUnassignedPointColor(0,0,0);
-
-        for (int i = 0; i < vertices.size(); ++i) {
-            if (mark[i] == 0) {
-                averageUnassignedPoint += vertices[i];
-                averageUnassignedPointColor+=colors[i];
+        QVector<QVector3D> sommetNonAssignes;
+        if(add){
+            for(int i=0;i<indiceNonAssignes.size();i++){
+                sommetNonAssignes.push_back(vertices[indiceNonAssignes[i]]);
             }
         }
-        if (m > 0) {
-            averageUnassignedPoint /= m;
-            averageUnassignedPointColor/=m;
-            centroids.push_back(averageUnassignedPoint);
-            oldCentroids.push_back(averageUnassignedPoint);
-            centroidColors.push_back(averageUnassignedPointColor);
-        }
-        */
-        // Vérifier la convergence
-        /*
-        if(m>vertices.size()/5){
-            if(seuilCouleur<255)seuilCouleur+=10;
-            if(seuilDistance<1)seuilDistance+=0.05;
-        }*/
-        if(!add||k>80){
-            int seuil = 1000;
-            int nb=0;
-            converged = true;
-            for (int i = 0; i < k; ++i) {
-                if (centroids[i] != oldCentroids[i]) {
-                    nb++;
+        int randomIndex = rand() % sommetNonAssignes.size();
+        centroids.push_back(vertices[indiceNonAssignes[randomIndex]]);
+        oldCentroids.push_back(vertices[indiceNonAssignes[randomIndex]]);
+        centroidColors.push_back(colors[indiceNonAssignes[randomIndex]]);
+        //Verification convergence sur nombre de changement de classe si on ajoute pas de centroide
+        if(!add){
+            int seuilConvergence=2000;
+            int nbChangementClasse=0;
+            for(int i=0;i<centroids.size();i++){
+                if(oldCentroids[i]!=centroids[i]){
+                    nbChangementClasse++;
                 }
             }
-            if(nb<seuil) converged=true;
+            if(nbChangementClasse<seuilConvergence){
+                converged=true;
+            }
             else{
-                for (int i = 0; i < k; ++i) {
+                for(int i=0;i<clusters.size();i++){
                     clusters[i].clear();
+                    colors_[i].clear();
+                    normals_[i].clear();
                 }
             }
         }
-        else {
-            for (int i = 0; i < k; ++i) {
-                clusters[i].clear();
-            }
-        }
-        qDebug()<<m;
-
     }
 
     // Créer les sous-meshes à partir des clusters

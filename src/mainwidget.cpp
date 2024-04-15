@@ -314,7 +314,7 @@ void MainWidget::switchNuageDePoint(){
 }
 
 void MainWidget::parseNuageDePoint(){
-    QVector<NuageDePoint *> NuageDePointSupplementaire = currentNuageDePoint->parseNuageDePoint();
+    QVector<NuageDePoint *> NuageDePointSupplementaire = currentNuageDePoint->parseNDP();
     for(NuageDePoint* ndp : NuageDePointSupplementaire) {
         allNuageDePoint.append( ndp );
     }
