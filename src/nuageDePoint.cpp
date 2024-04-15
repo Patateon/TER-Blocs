@@ -328,8 +328,12 @@ QVector<NuageDePoint*> NuageDePoint::parseNDP() {
                 int ind=id_nearest_neighbors[j];
                 float distance=square_distances_to_neighbors[j];
                 if(distance<dist[ind]&&distance<seuilDistance){
-                    dist[ind]=distance;
-                    classe[ind]=i;
+                    float distColor=euclidean_distance(centroidColors[i],colors[ind]);
+                    if(distColor<seuilCouleur/256.0){
+                        dist[ind]=distance;
+                        classe[ind]=i;
+                    }
+
                 }
             }
             delete [] id_nearest_neighbors;
@@ -391,7 +395,7 @@ QVector<NuageDePoint*> NuageDePoint::parseNDP() {
         int seuilConvergence=5000;
         int nbChangementClasse=0;
         qDebug()<<k;
-        if(!add||k>60){
+        if(!add||k>80){
             for(int i=0;i<centroids.size();i++){
                 if(oldCentroids[i]!=centroids[i]){
                     nbChangementClasse++;

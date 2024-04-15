@@ -95,7 +95,7 @@ void ANNkd_tree::annkSearch(
 {
 	ANNkdDim = dim;						// copy arguments to static equivs
 	ANNkdQ = q;
-	ANNkdPts = pts;
+    ANNkdPts = pts;
 	ANNptsVisited = 0;					// initialize count of points visited
 
 	if (k > n_pts) {					// too many near neighbors?
