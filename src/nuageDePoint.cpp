@@ -21,7 +21,7 @@ QVector3D generate_unique_color(const std::vector<QVector3D>& couleurs) {
 
         // Vérifier si la couleur est unique
         unique = true;
-        for (const auto& c : couleurs) {
+        for (const auto& c : couleurs ) {
             float dr = c.x() - r;
             float dg = c.y() - g;
             float db = c.z() - b;
