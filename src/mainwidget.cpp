@@ -29,21 +29,21 @@ void MainWidget::mousePressEvent(QMouseEvent *e)
     mousePressPosition = QVector2D(e->position());
     switch (e->button()) {
     case Qt::LeftButton:
-        camera.beginRotate(e->position().x(), e->position().y());
+        camera.beginRotate(mousePressPosition.x(), mousePressPosition.y());
         mouseMovePressed = false;
         mouseRotatePressed = true;
         mouseZoomPressed = false;
         break;
     case Qt::RightButton:
-        lastX = e->position().x();
-        lastY = e->position().y();
+        lastX = mousePressPosition.x();
+        lastY = mousePressPosition.y();
         mouseMovePressed = true;
         mouseRotatePressed = false;
         mouseZoomPressed = false;
         break;
     case Qt::MiddleButton:
         if (!mouseZoomPressed) {
-            lastZoom = e->position().y();
+            lastZoom = mousePressPosition.y();
             mouseMovePressed = false;
             mouseRotatePressed = false;
             mouseZoomPressed = true;
@@ -59,12 +59,41 @@ void MainWidget::mouseMoveEvent(QMouseEvent *event)
 {
     int x = event->position().x();
     int y = event->position().y();
+    float cameraSpeed = 10.0f;
 
     if (mouseRotatePressed) {
         camera.rotate(x, y);
     }
     else if (mouseMovePressed) {
-        camera.move((x - lastX) / static_cast<float>(SCREENWIDTH), -(lastY - y) / static_cast<float>(SCREENHEIGHT), 0.0);
+        // // Position initial de la caméra
+        // float x, y, z;
+        // camera.getPos(x, y, z);
+        // QVector3D cameraPosition(x, y, z);
+
+        // float targetDistance = (cameraPosition - cameraTarget).length();
+
+        // // Mouvement de la souris sur l'écran
+        // QVector3D delta = QVector3D((x - lastX) / static_cast<float>(SCREENWIDTH), (lastY - y) / static_cast<float>(SCREENHEIGHT), 0.0);
+
+        // // Axe de la nouvelle position
+        // QVector3D newAxis;
+        // newAxis = (cameraPosition + delta) - cameraTarget;
+
+        // newAxis = (targetDistance / newAxis.length()) * newAxis;
+
+        // QVector3D newPos;
+        // newPos = cameraPosition + delta;
+
+        // QVector3D Movement;
+        // Movement = newPos - cameraPosition;
+
+        // camera.move(Movement.x(), Movement.y(), Movement.z());
+
+        // qDebug()<<"Movement :"<<Movement;
+        // qDebug()<<"Initial Position :"<<cameraPosition;
+        // qDebug()<<"New Position :"<<newPos;
+        camera.move((x - lastX) / static_cast<float>(SCREENWIDTH) * cameraSpeed, (lastY - y) / static_cast<float>(SCREENHEIGHT), 0.0);
+        // qDebug()<<"Delta mouse :"<<(x - lastX) / static_cast<float>(SCREENWIDTH)<<" "<<(lastY - y) / static_cast<float>(SCREENHEIGHT);
         lastX = x;
         lastY = y;
     }
@@ -259,6 +288,7 @@ void MainWidget::paintGL()
     // Get camera position for view matrix computation and for lightnings computations
     float x,y,z;
     camera.getPos(x,y,z);
+    QVector3D cameraPosition(x, y, z);
 
     //! [6]
     // Calculate model view transformation
@@ -267,14 +297,16 @@ void MainWidget::paintGL()
     // Compute view matrix
     viewMatrix = QMatrix4x4();
     if (mainCamera){
-        viewMatrix.lookAt(QVector3D(x, y, z), cameraTarget, QVector3D(0.0, 1.0, 0.0));
+        viewMatrix.lookAt(cameraPosition, cameraTarget, cameraUp);
     }else{
-        viewMatrix.lookAt(QVector3D(x, y, z), cameraTarget2, QVector3D(0.0, 1.0, 0.0));
+        viewMatrix.lookAt(cameraPosition, cameraTarget2, cameraUp);
     }
 
     // Set modelview-projection matrix
-    program.setUniformValue("mvp_matrix", projectionMatrix * viewMatrix * modelMatrix);
-    program.setUniformValue("cameraPosition", QVector3D(x, y, z));
+    program.setUniformValue("projection", projectionMatrix);
+    program.setUniformValue("view", viewMatrix);
+    program.setUniformValue("model", modelMatrix);
+    program.setUniformValue("cameraPosition", cameraPosition);
     //! [6]
 
     // Use texture unit 0 which contains cube.png

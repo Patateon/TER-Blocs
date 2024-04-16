@@ -73,6 +73,7 @@ private:
     QMatrix4x4 projectionMatrix;
     QVector3D cameraTarget;
     QVector3D cameraTarget2;
+    QVector3D cameraUp = QVector3D(0.0, 1.0, 0.0);
     static unsigned int SCREENWIDTH ;
     static unsigned int SCREENHEIGHT ;
     static bool mouseRotatePressed ;

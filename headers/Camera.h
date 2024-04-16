@@ -46,6 +46,7 @@ public:
       float x=p.x(); float y= p.y(); float z= p.z();
       getPos (x, y, z);
   }
+  void setPos (float x, float y, float z);
   //inline void getPos (Vec3 & p) { getPos (p[0], p[1], p[2]); }
   
 private:

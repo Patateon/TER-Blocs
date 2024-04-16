@@ -10,8 +10,6 @@
 #include "../headers/Camera.h"
 #include <GL/gl.h>
 
-#include <iostream>
-
 using namespace std;
 
 static int _spinning, _moving;
@@ -104,19 +102,19 @@ void Camera::resize (int _W, int _H) {
 
 void Camera::initPos () {
   if (!ini) {
-  _spinning = spinning;
-  _moving = moving;;
-  _beginu = beginu;
-  _beginv = beginv;
-  _curquat[0] = curquat[0];
-  _curquat[1] = curquat[1];
-  _curquat[2] = curquat[2];
-  _curquat[3] = curquat[3];
-  _x = x;
-  _y = y;
-  _z = z;;
-  __zoom = _zoom;
-  ini = true;
+    _spinning = spinning;
+    _moving = moving;;
+    _beginu = beginu;
+    _beginv = beginv;
+    _curquat[0] = curquat[0];
+    _curquat[1] = curquat[1];
+    _curquat[2] = curquat[2];
+    _curquat[3] = curquat[3];
+    _x = x;
+    _y = y;
+    _z = z;;
+    __zoom = _zoom;
+    ini = true;
   } else {
     spinning = _spinning;
     moving = _moving;;
@@ -183,6 +181,11 @@ void Camera::apply () {
     glMultMatrixf(&m[0][0]);
 }
 
+void Camera::setPos (float nx, float ny, float nz){
+    x = nx;
+    y = ny;
+    z = nz;
+}
 
 void Camera::getPos (float & X, float & Y, float & Z) {
   GLfloat m[4][4]; 
