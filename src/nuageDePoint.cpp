@@ -301,7 +301,7 @@ QVector<NuageDePoint*> NuageDePoint::parseNDP() {
     float seuilDistance=DISTANCE_XYZ;
     float seuilCouleur=DISTANCE_COULEURS;
     // Nombre de clusters (k)
-    int k = 40; // Vous pouvez modifier ce nombre selon vos besoins
+    int k = 20; // Vous pouvez modifier ce nombre selon vos besoins
     QVector<QVector3D> centroidColors;
     QVector<QVector3D> centroids=initializeCentroidsKMeansPlusPlus(vertices,colors,k,centroidColors);
 
@@ -396,9 +396,6 @@ QVector<NuageDePoint*> NuageDePoint::parseNDP() {
         else{
             if(add){
                 k++;
-                centroidColors.resize(k);
-                centroids.resize((k));
-                oldCentroids.resize(k);
                 clusters.resize(k);
                 colors_.resize(k);
                 normals_.resize(k);
@@ -406,6 +403,9 @@ QVector<NuageDePoint*> NuageDePoint::parseNDP() {
                 centroids.push_back(vertices[indiceNonAssignes[randomIndex]]);
                 oldCentroids.push_back(vertices[indiceNonAssignes[randomIndex]]);
                 centroidColors.push_back(colors[indiceNonAssignes[randomIndex]]);
+                centroidColors.resize(k);
+                centroids.resize((k));
+                oldCentroids.resize(k);
             }
             for(int i=0;i<clusters.size();i++){
                 clusters[i].clear();
@@ -428,6 +428,7 @@ QVector<NuageDePoint*> NuageDePoint::parseNDP() {
     // Créer les sous-meshes à partir des clusters
     for (int i = 0; i < k; ++i) {
         qDebug()<<i<<clusters.size();
+        qDebug()<<clusters[i].size();
         // Vérifier si le cluster n'est pas vide
         if (!clusters[i].isEmpty()) {
             NuageDePoint* sousNDP = new NuageDePoint();
