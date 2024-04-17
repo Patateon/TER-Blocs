@@ -344,6 +344,7 @@ QVector<NuageDePoint*> NuageDePoint::parseNDP() {
             if(classe[i]!=-1){
                 clusters[classe[i]].push_back(vertices[i]);
                 colors_[classe[i]].push_back(colors[i]);
+                normals_[classe[i]].push_back(normals[i]);
                 mark[i]=1;
             }
         }
@@ -436,7 +437,7 @@ QVector<NuageDePoint*> NuageDePoint::parseNDP() {
             for (int j = 0; j < clusters[i].size(); ++j) {
                 sousNDP->addVertices(clusters[i][j]);
                 sousNDP->addColors(colors_[i][j]);
-                //sousNDP->addNormals(normals_[i][j]);
+                sousNDP->addNormals(normals_[i][j]);
             }
             qDebug() << "Taille sous mesh" << sousNDP->getVertices().size();
             if(sousNDP->getVertices().size()<NBPOINTSMAX && sousNDP->getVertices().size()>NBPOINTSMIN){

@@ -311,10 +311,14 @@ void MainWidget::switchNuageDePoint(){
     currentNuageDePoint->bindAndAllocateBuffer();
     nextNuageDePointIndice++;
     update();
+    qDebug() << currentNuageDePoint->getVertices().size() ;
+    qDebug() << currentNuageDePoint->getColors().size() ;
+    qDebug() << currentNuageDePoint->getNormals().size() ;
 }
 
 void MainWidget::parseNuageDePoint(){
-    QVector<NuageDePoint *> NuageDePointSupplementaire = currentNuageDePoint->parseNDP();
+    QVector<Nuagegit@github.com:Patateon/TER-Blocs.gitDePoint *> NuageDePointSupplementaire = currentNuageDePoint->parseNDP();
+    //QVector<NuageDePoint *> NuageDePointSupplementaire = currentNuageDePoint->parseNuageDePoint();
     for(NuageDePoint* ndp : NuageDePointSupplementaire) {
         allNuageDePoint.append( ndp );
     }
