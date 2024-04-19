@@ -23,6 +23,7 @@ SOURCES += \
     ann/src/kd_tree.cpp \
     ann/src/kd_util.cpp \
     ann/src/perf.cpp \
+    src/analyseParCGAL.cpp \
     src/main.cpp \
     src/mainwidget.cpp \
     src/nuageDePoint.cpp \

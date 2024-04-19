@@ -3,6 +3,7 @@
 
 #include <random>
 
+
 #include "kdtree.h"
 #include <vector>
 #include <QOpenGLShaderProgram>
@@ -10,18 +11,20 @@
 
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Delaunay_triangulation_3.h>
-typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
-typedef K::Point_3 Point_3;
-typedef CGAL::Delaunay_triangulation_3<K> Delaunay;
 
 #include <CGAL/property_map.h>
 #include <CGAL/IO/read_points.h>
 #include <CGAL/Point_with_normal_3.h>
-#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Shape_detection/Efficient_RANSAC.h>
+
+#include <CGAL/polynomial_utils.h>
+#include <CGAL/Kernel/global_functions.h>
 
 // Type declarations.
 typedef CGAL::Exact_predicates_inexact_constructions_kernel  Kernel;
+typedef CGAL::Delaunay_triangulation_3<Kernel> Delaunay;
+typedef Kernel::Point_3 Point_3;
+typedef Kernel::Plane_3 Plane_3;
 typedef std::pair<Kernel::Point_3, Kernel::Vector_3>         Point_with_normal;
 typedef std::vector<Point_with_normal>                       Pwn_vector;
 typedef CGAL::First_of_pair_property_map<Point_with_normal>  Point_map;
@@ -98,5 +101,7 @@ private:
 
     Descripteur descripteur;
 };
+
+Point_3 toPoint_3(const QVector3D& vec);
 
 #endif // NuageDePoint_H
