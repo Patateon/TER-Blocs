@@ -128,12 +128,26 @@ void NuageDePoint::analyseNuageDePoint(){
     // Register planar shapes via template method.
     ransac.add_shape_factory<Plane>();
     // Register spherical shapes via template method
- /*   ransac.add_shape_factory<Sphere>();
-    ransac.add_shape_factory<Cone>();
-    ransac.add_shape_factory<Cylinder>();
-    ransac.add_shape_factory<Torus>();*/
+    ransac.add_shape_factory<Sphere>();
+    /*ransac.add_shape_factory<Cone>();
+    ransac.add_shape_factory<Cylinder>();*/
+    ransac.add_shape_factory<Torus>();
     // Detect registered shapes with default parameters.
-    ransac.detect();
+    // Set parameters for shape detection.
+    Efficient_ransac::Parameters parameters;
+    // Set probability to miss the largest primitive at each iteration.
+    parameters.probability = 0.05;
+    // Detect shapes with at least 200 points.
+    parameters.min_points = 200;
+    // Set maximum Euclidean distance between a point and a shape.
+    parameters.epsilon = 0.002;
+    // Set maximum Euclidean distance between points to be clustered.
+    parameters.cluster_epsilon = 0.30;
+    // Set maximum normal deviation.
+    // 0.8 < dot(surface_normal, point_normal);
+    parameters.normal_threshold = 0.8;
+    // Detect shapes.
+    ransac.detect(parameters);
     // Print number of detected shapes.
     qDebug() << ransac.shapes().end() - ransac.shapes().begin()
               << " shapes detected." ;
@@ -215,7 +229,14 @@ void NuageDePoint::analyseNuageDePoint(){
     moyDotProductNormals/=(moyNormalShape.size()*(moyNormalShape.size() + 1))/2;
 
     qDebug() << " Moyenne des produits scalaires entre les normales (1normal = 1shape)  : " << moyDotProductNormals;
-    if(moyDotProductNormals <0.25){
+    // Vérifiez si la forme détectée est un torus
+    //premier forme = torus avec bcp de point = trou
+    Efficient_ransac::Shape_range shapes = ransac.shapes();
+    Efficient_ransac::Shape_range::iterator it_torus = shapes.begin();
+    if (Torus* torus = dynamic_cast<Torus*>(it_torus->get()) )  {
+        qDebug() << "Surement une prise a trou";
+    }
+    else if(moyDotProductNormals <0.25){
         //beaucoup d angle
           qDebug() << "Surement une regle";
     }
