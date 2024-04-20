@@ -31,9 +31,9 @@ public:
   void resize (int W, int H);
 
   QMatrix4x4 getProjectionMatrix() const;
+  QMatrix4x4 lookAt(QVector3D target, QVector3D up);
   
   void initPos ();
-  QMatrix4x4 lookAt(QVector3D target);
   void move (float dx, float dy, float dz);
   void beginRotate (int u, int v);
   void rotate (int u, int v);

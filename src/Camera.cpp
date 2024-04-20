@@ -32,19 +32,26 @@ Camera::Camera () {
   
   trackball (curquat, 0.0, 0.0, 0.0, 0.0);
   x = 0.0; // Set the initial x position
-  y = 1.0; // Set the initial y position
-  z = 8.0; // Set the initial z position
+  y = 0.0; // Set the initial y position
+  z = 0.0; // Set the initial z position
   _zoom = 0.0;
 }
 
 
-QMatrix4x4 Camera::lookAt(QVector3D target) {
-    QVector3D cameraPos(x, y, z);
-    QVector3D up(0.0f, 1.0f, 0.0f);
+QMatrix4x4 Camera::lookAt(QVector3D target, QVector3D up) {
+    float nx, ny, nz;
+    this->getPos(nx, ny, nz);
+    QVector3D cameraPos(nx, ny, nz);
 
-    QMatrix4x4 view = QMatrix4x4();
+    QMatrix4x4 view;
+
+    view.translate(x, y, z);
+    view.translate(0.0, 0.0, -_zoom);
+
     view.lookAt(cameraPos, target, up);
+
     return view;
+}
 
     // // Calcule la direction de vue
     // QVector3D viewDirection = (target - cameraPos).normalized();
@@ -66,15 +73,7 @@ QMatrix4x4 Camera::lookAt(QVector3D target) {
     // curquat[1] = rotation.x();
     // curquat[2] = rotation.y();
     // curquat[3] = rotation.z();
-}
-
-
-
-
-
-
-
-
+// }
 
 
 QMatrix4x4 Camera::getProjectionMatrix() const {
@@ -150,10 +149,10 @@ void Camera::beginRotate (int u, int v) {
 void Camera::rotate (int u, int v) {
   if (moving) {
     trackball(lastquat,
-	      (2.0 * beginu - W) / W,
-	      (H - 2.0 * beginv) / H,
-	      (2.0 * u - W) / W,
-	      (H - 2.0 * v) / H);
+          (2.0 * beginu - W) / W,
+          (H - 2.0 * beginv) / H,
+          (2.0 * u - W) / W,
+          (H - 2.0 * v) / H);
     beginu = u;
     beginv = v;
     spinning = 1;

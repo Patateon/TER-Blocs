@@ -17,6 +17,7 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLTexture>
 
+
 class GeometryEngine;
 
 class MainWidget : public QOpenGLWidget, protected QOpenGLFunctions

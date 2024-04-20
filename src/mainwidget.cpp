@@ -26,24 +26,25 @@ MainWidget::~MainWidget()
 //! [0]
 void MainWidget::mousePressEvent(QMouseEvent *e)
 {
-    mousePressPosition = QVector2D(e->position());
+    int x = e->position().x();
+    int y = e->position().y();
     switch (e->button()) {
     case Qt::LeftButton:
-        camera.beginRotate(mousePressPosition.x(), mousePressPosition.y());
+        camera.beginRotate(x, y);
         mouseMovePressed = false;
         mouseRotatePressed = true;
         mouseZoomPressed = false;
         break;
     case Qt::RightButton:
-        lastX = mousePressPosition.x();
-        lastY = mousePressPosition.y();
+        lastX = x;
+        lastY = y;
         mouseMovePressed = true;
         mouseRotatePressed = false;
         mouseZoomPressed = false;
         break;
     case Qt::MiddleButton:
         if (!mouseZoomPressed) {
-            lastZoom = mousePressPosition.y();
+            lastZoom = y;
             mouseMovePressed = false;
             mouseRotatePressed = false;
             mouseZoomPressed = true;
@@ -65,35 +66,7 @@ void MainWidget::mouseMoveEvent(QMouseEvent *event)
         camera.rotate(x, y);
     }
     else if (mouseMovePressed) {
-        // // Position initial de la caméra
-        // float x, y, z;
-        // camera.getPos(x, y, z);
-        // QVector3D cameraPosition(x, y, z);
-
-        // float targetDistance = (cameraPosition - cameraTarget).length();
-
-        // // Mouvement de la souris sur l'écran
-        // QVector3D delta = QVector3D((x - lastX) / static_cast<float>(SCREENWIDTH), (lastY - y) / static_cast<float>(SCREENHEIGHT), 0.0);
-
-        // // Axe de la nouvelle position
-        // QVector3D newAxis;
-        // newAxis = (cameraPosition + delta) - cameraTarget;
-
-        // newAxis = (targetDistance / newAxis.length()) * newAxis;
-
-        // QVector3D newPos;
-        // newPos = cameraPosition + delta;
-
-        // QVector3D Movement;
-        // Movement = newPos - cameraPosition;
-
-        // camera.move(Movement.x(), Movement.y(), Movement.z());
-
-        // qDebug()<<"Movement :"<<Movement;
-        // qDebug()<<"Initial Position :"<<cameraPosition;
-        // qDebug()<<"New Position :"<<newPos;
         camera.move((x - lastX) / static_cast<float>(SCREENWIDTH) * cameraSpeed, (lastY - y) / static_cast<float>(SCREENHEIGHT), 0.0);
-        // qDebug()<<"Delta mouse :"<<(x - lastX) / static_cast<float>(SCREENWIDTH)<<" "<<(lastY - y) / static_cast<float>(SCREENHEIGHT);
         lastX = x;
         lastY = y;
     }
@@ -202,7 +175,9 @@ void MainWidget::initializeGL()
     cameraTarget = currentNuageDePoint->getBarycentre();
     qDebug()<<"Barycentre du ndg courant : "<<cameraTarget;
 
+    viewMatrix = QMatrix4x4();
     camera.initPos();
+    camera.zoom(3);
     // updateCamera(cameraTarget);
     // float x,y,z;
     // camera.getPos(x,y,z);
@@ -288,24 +263,27 @@ void MainWidget::paintGL()
     // Get camera position for view matrix computation and for lightnings computations
     float x,y,z;
     camera.getPos(x,y,z);
-    QVector3D cameraPosition(x, y, z);
+    QVector3D cameraPosition;
+    cameraPosition = QVector3D(x, y, z);
 
     //! [6]
     // Calculate model view transformation
     QMatrix4x4 modelMatrix;
-
     // Compute view matrix
-    viewMatrix = QMatrix4x4();
     if (mainCamera){
-        viewMatrix.lookAt(cameraPosition, cameraTarget, cameraUp);
+        // modelMatrix.translate(-cameraTarget);
+        viewMatrix = camera.lookAt(cameraTarget, cameraUp);
     }else{
-        viewMatrix.lookAt(cameraPosition, cameraTarget2, cameraUp);
+        // modelMatrix.translate(-cameraTarget2);
+        viewMatrix = camera.lookAt(cameraTarget2, cameraUp);
     }
 
+    qDebug()<<"Camera Position :"<<cameraPosition;
+
     // Set modelview-projection matrix
-    program.setUniformValue("projection", projectionMatrix);
-    program.setUniformValue("view", viewMatrix);
     program.setUniformValue("model", modelMatrix);
+    program.setUniformValue("view", viewMatrix);
+    program.setUniformValue("projection", projectionMatrix);
     program.setUniformValue("cameraPosition", cameraPosition);
     //! [6]
 
