@@ -152,6 +152,12 @@ void NuageDePoint::analyseNuageDePoint(){
     qDebug() << ransac.shapes().end() - ransac.shapes().begin()
              << " shapes detected." ;
 
+    // Check if shapes have been detected
+    if (ransac.shapes().empty()) {
+        qDebug() << "No shapes detected.";
+        return; // Exit the function if no shapes are detected
+    }
+
     // Récupérer les formes détectées
     const auto& detected_shapes = ransac.shapes();
 
