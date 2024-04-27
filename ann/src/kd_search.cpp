@@ -25,7 +25,7 @@
 //----------------------------------------------------------------------
 
 #include "kd_search.h"					// kd-search declarations
-
+#include <iostream>
 //----------------------------------------------------------------------
 //	Approximate nearest neighbor searching by kd-tree search
 //		The kd-tree is searched for an approximate nearest neighbor.
@@ -93,10 +93,9 @@ void ANNkd_tree::annkSearch(
 	ANNdistArray		dd,				// the approximate nearest neighbor
 	double				eps)			// the error bound
 {
-
 	ANNkdDim = dim;						// copy arguments to static equivs
 	ANNkdQ = q;
-	ANNkdPts = pts;
+    ANNkdPts = pts;
 	ANNptsVisited = 0;					// initialize count of points visited
 
 	if (k > n_pts) {					// too many near neighbors?
@@ -109,7 +108,6 @@ void ANNkd_tree::annkSearch(
 	ANNkdPointMK = new ANNmin_k(k);		// create set for closest k points
 										// search starting at the root
 	root->ann_search(annBoxDistance(q, bnd_box_lo, bnd_box_hi, dim));
-
 	for (int i = 0; i < k; i++) {		// extract the k-th closest points
 		dd[i] = ANNkdPointMK->ith_smallest_key(i);
 		nn_idx[i] = ANNkdPointMK->ith_smallest_info(i);

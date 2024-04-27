@@ -4,7 +4,7 @@
 #include <ANN/ANN.h>
 #include <vector>
 #include <cassert>
-
+#include <iostream>
 class BasicANNkdTree {
     ANNpointArray ANNvertex;
     ANNkd_tree *ANNtree;

@@ -333,12 +333,18 @@ void MainWidget::switchNuageDePoint(){
     currentNuageDePoint = allNuageDePoint[nextNuageDePointIndice];
     currentNuageDePoint->bindAndAllocateBuffer();
     nextNuageDePointIndice++;
+    /*
+    qDebug() << currentNuageDePoint->getVertices().size() ;
+    qDebug() << currentNuageDePoint->getColors().size() ;
+    qDebug() << currentNuageDePoint->getNormals().size() ;
+    */
     cameraTarget2 = currentNuageDePoint->getBarycentre();
     update();
 }
 
 void MainWidget::parseNuageDePoint(){
-    QVector<NuageDePoint *> NuageDePointSupplementaire = currentNuageDePoint->parseNuageDePoint();
+    QVector<NuageDePoint *> NuageDePointSupplementaire = currentNuageDePoint->parseNDP();
+    //QVector<NuageDePoint *> NuageDePointSupplementaire = currentNuageDePoint->parseNuageDePoint();
     for(NuageDePoint* ndp : NuageDePointSupplementaire) {
         ndp->computeBarycentre();
         allNuageDePoint.append( ndp );

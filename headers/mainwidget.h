@@ -17,9 +17,6 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLTexture>
 
-
-class GeometryEngine;
-
 class MainWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
     Q_OBJECT
@@ -56,7 +53,6 @@ protected:
 private:
     QBasicTimer timer;
     QOpenGLShaderProgram program;
-    GeometryEngine *geometries = nullptr;
 
     PlyFile *ply =nullptr;
     QVector<NuageDePoint *> allNuageDePoint;
