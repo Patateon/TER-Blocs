@@ -55,6 +55,18 @@ enum class Descripteur {
     Regle
 };
 
+struct QVector3DComparer {
+    bool operator()(const QVector3D& c1, const QVector3D& c2) const {
+        // Compare les coordonnées x, y, et z
+        if (c1.x() != c2.x()) return c1.x() < c2.x();
+        if (c1.y() != c2.y()) return c1.y() < c2.y();
+        return c1.z() < c2.z();
+    }
+};
+
+float euclidean_distance(const float p1, const float p2);
+float euclidean_distance(const QVector3D& p1, const QVector3D& p2);
+
 class NuageDePoint
 {
 public:

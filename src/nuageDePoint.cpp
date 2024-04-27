@@ -67,49 +67,6 @@ float euclidean_distance(const QVector3D& p1, const QVector3D& p2) {
 }
 
 
-struct QVector3DComparer {
-    bool operator()(const QVector3D& c1, const QVector3D& c2) const {
-        // Compare les coordonnées x, y, et z
-        if (c1.x() != c2.x()) return c1.x() < c2.x();
-        if (c1.y() != c2.y()) return c1.y() < c2.y();
-        return c1.z() < c2.z();
-    }
-};
-
-// Fonction pour trouver la couleur dominante
-QVector3D getDominantColor(const QVector<QVector3D>& couleurs) {
-    // Définir une carte pour compter les occurrences de chaque couleur
-    std::map<QVector3D, int, QVector3DComparer> compteurs;
-
-    // Itérer sur toutes les couleurs et les regrouper
-    for (const QVector3D& couleur : couleurs) {
-        // Vérifier si une couleur similaire est déjà présente dans la carte
-        bool couleurTrouvee = false;
-        for (auto& it : compteurs) {
-            if (euclidean_distance(couleur, it.first) < DISTANCE_COULEURS_DOMINANTE) { // Choisir une distance de seuil appropriée
-                it.second++;
-                couleurTrouvee = true;
-                break;
-            }
-        }
-        // Si la couleur n'a pas été trouvée, l'ajouter à la carte
-        if (!couleurTrouvee) {
-            compteurs[couleur] = 1;
-        }
-    }
-
-    // Trouver la couleur avec le compteur le plus élevé
-    QVector3D couleurDominante;
-    int maxCompteur = 0;
-    for (const auto& it : compteurs) {
-        if (it.second > maxCompteur) {
-            maxCompteur = it.second;
-            couleurDominante = it.first;
-        }
-    }
-
-    return couleurDominante;
-}
 
 NuageDePoint::NuageDePoint() {
     arrayBuf.create();
@@ -374,7 +331,7 @@ QVector<NuageDePoint*> NuageDePoint::parseNDP() {
             }
         }
 
-    /*
+        /*
         else{
             for(int i=0;i<clusters.size();i++){
                 clusters[i].clear();
@@ -414,22 +371,7 @@ QVector<NuageDePoint*> NuageDePoint::parseNDP() {
 
 
 
-void NuageDePoint::clearNuageDePoint() {
-    qDebug() << "Nombre de vertices avant nettoyage " << vertices.size();
-    QVector3D dominantColor = getDominantColor(colors);
-    qDebug() << "Couleur dominante " << dominantColor.x()  << dominantColor.y () << dominantColor.z();
-    for(int i=0; i<vertices.size();){
-        float distance = euclidean_distance(dominantColor, colors[i]);
-        if(distance < DISTANCE_COULEURS_DOMINANTE){
-            vertices.removeAt(i);
-            colors.removeAt(i);
-            normals.removeAt(i);
-        } else {
-            i++;
-        }
-    }
-    qDebug() << "Nombre de vertices apres nettoyage " << vertices.size();
-}
+
 
 void NuageDePoint::clone( NuageDePoint* aCopier) {
     vertices = aCopier->vertices;
