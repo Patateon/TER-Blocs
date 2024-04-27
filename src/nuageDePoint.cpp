@@ -53,7 +53,6 @@ void NuageDePoint::performDelaunayTriangulation(const QVector<QVector3D>& vertic
 }
 
 
-
 float euclidean_distance(const float p1, const float p2) {
     float dr = p1 - p2;
     return sqrt( dr*dr );
@@ -67,12 +66,12 @@ float euclidean_distance(const QVector3D& p1, const QVector3D& p2) {
 }
 
 
-
 NuageDePoint::NuageDePoint() {
     arrayBuf.create();
     colorBuf.create();
     normalBuf.create();
 }
+
 NuageDePoint::~NuageDePoint() {
     arrayBuf.destroy();
     colorBuf.destroy();
@@ -107,6 +106,7 @@ QVector<QVector3D>& NuageDePoint::getNormals() {
 std::vector<std::vector<int>>& NuageDePoint::getTriangles(){
     return triangles;
 }
+
 
 QVector<NuageDePoint *> NuageDePoint::parseNuageDePoint() {
     QVector<NuageDePoint *> allNuageDePoint;
@@ -193,12 +193,12 @@ QVector<QVector3D> initializeCentroidsKMeansPlusPlus(const QVector<QVector3D>& p
             }
         }
         float dmax=std::numeric_limits<float>::min();
-        float dmaxColor=std::numeric_limits<float>::min();
+        // float dmaxColor=std::numeric_limits<float>::min();
         int indmax=-1;
         for(int i=0;i<distancesSquared.size();i++){
             if(distancesSquared[i]>dmax){//&&distancesSquaredColor[i]>dmaxColor) {
                 dmax=distancesSquared[i];
-                dmaxColor=distancesSquaredColor[i];
+                // dmaxColor=distancesSquaredColor[i];
                 indmax=i;
             }
         }
@@ -208,7 +208,6 @@ QVector<QVector3D> initializeCentroidsKMeansPlusPlus(const QVector<QVector3D>& p
 
     return centroids;
 }
-
 
 
 QVector<NuageDePoint*> NuageDePoint::parseNDP() {
@@ -256,7 +255,7 @@ QVector<NuageDePoint*> NuageDePoint::parseNDP() {
             delete [] square_distances_to_neighbors;
         }
         // Assigner les classes
-        for(int i=0;i<classe.size();i++){
+        for(uint i=0;i<classe.size();i++){
             if(classe[i]!=-1){
                 clusters[classe[i]].push_back(vertices[i]);
                 colors_[classe[i]].push_back(colors[i]);
@@ -280,7 +279,7 @@ QVector<NuageDePoint*> NuageDePoint::parseNDP() {
         int seuilNbNonAssignes=vertices.size()/4;
         int nbNonAssignes=0;
         std::vector<int> indiceNonAssignes;
-        for(int i=0;i<mark.size();i++){
+        for(uint i=0;i<mark.size();i++){
             if(mark[i]==0) {
                 nbNonAssignes++;
                 indiceNonAssignes.push_back((i));
@@ -292,7 +291,7 @@ QVector<NuageDePoint*> NuageDePoint::parseNDP() {
         //qDebug()<<"nn assignes"<<nbNonAssignes<<"k "<<k;
         QVector<QVector3D> sommetNonAssignes;
         if(add){
-            for(int i=0;i<indiceNonAssignes.size();i++){
+            for(uint i=0;i<indiceNonAssignes.size();i++){
                 sommetNonAssignes.push_back(vertices[indiceNonAssignes[i]]);
             }
         }
@@ -369,10 +368,6 @@ QVector<NuageDePoint*> NuageDePoint::parseNDP() {
 }
 
 
-
-
-
-
 void NuageDePoint::clone( NuageDePoint* aCopier) {
     vertices = aCopier->vertices;
     colors = aCopier->colors;
@@ -380,6 +375,8 @@ void NuageDePoint::clone( NuageDePoint* aCopier) {
 
     (this)->bindAndAllocateBuffer();
 }
+
+
 void NuageDePoint::buildKdtree(){
 
     vector<QVector3D> verticesVectorVec3;
@@ -388,6 +385,7 @@ void NuageDePoint::buildKdtree(){
     }
     kdtree.build(verticesVectorVec3);
 }
+
 
 void NuageDePoint::bindAndAllocateBuffer(){
     arrayBuf.bind();
@@ -426,3 +424,141 @@ void NuageDePoint::drawGeometry(QOpenGLShaderProgram *program) {
     program->disableAttributeArray(colorLocation);
     program->disableAttributeArray(normalLocation);
 }
+
+
+void NuageDePoint::clearNuageDePoint() {
+    buildKdtree();
+    qDebug() << "Nombre de vertices avant nettoyage " << vertices.size();
+
+    Pwn_vector points;
+    Plane_3 plane;
+    Kernel::Point_3 centroid;
+
+    for(int i=0;i<vertices.size();i++) {
+        points.push_back(std::make_pair(Kernel::Point_3(vertices[i].x(),vertices[i].y(), vertices[i].z()), Kernel::Vector_3(normals[i].x(), normals[i].y(), normals[i].z())));
+    }
+    /*
+    qDebug() << "0 vert " << vertices[0];
+    const Point_with_normal& p = points[0];
+    QVector3D vertex(p.first.x(), p.first.y(), p.first.z());
+    qDebug() << "0 point " << vertex;
+*/
+    // Instantiate shape detection engine.
+    Efficient_ransac ransac;
+    // Provide input data.
+    ransac.set_input(points);
+    // Register planar shapes via template method.
+    ransac.add_shape_factory<Plane>();
+    // Detect registered shapes with default parameters.
+    // Set parameters for shape detection.
+    Efficient_ransac::Parameters parameters;
+    // Set probability to miss the largest primitive at each iteration.
+    parameters.probability = 0.05;
+    // Detect shapes with at least 200 points.
+    parameters.min_points = 5000;
+    // Set maximum Euclidean distance between a point and a shape.
+    parameters.epsilon = 0.002;
+    // Set maximum Euclidean distance between points to be clustered.
+    parameters.cluster_epsilon = 0.1;
+    // Set maximum normal deviation.
+    // 0.8 < dot(surface_normal, point_normal);
+    parameters.normal_threshold = 0.6;
+    // Detect shapes.
+    ransac.detect(parameters);
+
+    // Print number of detected shapes.
+    qDebug() << ransac.shapes().end() - ransac.shapes().begin()
+             << " shapes detected." ;
+
+    // Récupérer les formes détectées
+    const auto& detected_shapes = ransac.shapes();
+
+
+    Efficient_ransac::Shape_range::iterator it = ransac.shapes().begin();
+
+    std::vector<int> indices_to_erase;
+    while (it != ransac.shapes().end()) {
+        // Récupérer la forme détectée
+        boost::shared_ptr<Efficient_ransac::Shape> shape = *it;
+
+        // Utiliser Shape_base::info() pour imprimer les paramètres de la forme détectée
+        qDebug() << (*it)->info();
+        // Copy indices of assigned points to avoid modifying the original vector
+        auto indices = (*it)->indices_of_assigned_points();
+        //std::sort(indices.begin(), indices.end(), std::greater<int>());
+        /*
+        qDebug() << "index 0 vert" << vertices[indices[0]];
+        const Point_with_normal& p = points[indices[0]];
+        QVector3D vertex(p.first.x(), p.first.y(), p.first.z());
+        qDebug() << "index 0 point " << vertex;
+        */
+
+        for (auto index : indices) {
+            /*
+            // Find the vertex in the vertices vector
+            const Point_with_normal& p = points[index];
+            QVector3D vertex(p.first.x(), p.first.y(), p.first.z());
+            auto found_vertex = std::find(vertices.begin(), vertices.end(), vertex);
+
+
+            // Check if the vertex is found
+            if (found_vertex != vertices.end()) {
+                // Get the index of the found vertex
+                int vertex_index = std::distance(vertices.begin(), found_vertex);
+
+                // Erase elements from vectors based on the index
+                //vertices.erase(vertices.begin() + vertex_index);
+                //normals.erase(normals.begin() + vertex_index);
+                //colors.erase(colors.begin() + vertex_index);
+                colors[vertex_index] = QVector3D(1.0, 1.0, 1.0);
+            }
+            */
+            const Point_with_normal& p = points[index];
+            ANNpoint ann_point = annAllocPt(3);
+            ann_point[0]=p.first.x();
+            ann_point[1]=p.first.y();
+            ann_point[2]=p.first.z();
+            unsigned int nearest_index = kdtree.nearest(ann_point);
+            //qDebug() << "nearest index : " << nearest_index;
+            indices_to_erase.push_back(nearest_index);
+            //colors[nearest_index] = QVector3D(1.0, 1.0, 1.0);
+        }
+
+        // Increment shape iterator
+        it++;
+    }
+    // Sort the indices in descending order to ensure valid erasure
+    std::sort(indices_to_erase.rbegin(), indices_to_erase.rend());
+
+    // Erase elements from vectors using the stored indices
+    for (int i : indices_to_erase) {
+        vertices.erase(vertices.begin() + i);
+        normals.erase(normals.begin() + i);
+        colors.erase(colors.begin() + i);
+    }
+
+    points.clear();
+    indices_to_erase.clear();
+
+    qDebug() << "Nombre de vertices apres nettoyage " << vertices.size();
+}
+
+/*
+void NuageDePoint::clearNuageDePoint() {
+    qDebug() << "Nombre de vertices avant nettoyage " << vertices.size();
+    QVector3D dominantColor = getDominantColor(colors);
+    qDebug() << "Couleur dominante " << dominantColor.x()  << dominantColor.y () << dominantColor.z();
+    for(int i=0; i<vertices.size();){
+        float distance = euclidean_distance(dominantColor, colors[i]);
+        if(distance < DISTANCE_COULEURS_DOMINANTE){
+            vertices.removeAt(i);
+            colors.removeAt(i);
+            normals.removeAt(i);
+        } else {
+            i++;
+        }
+    }
+    qDebug() << "Nombre de vertices apres nettoyage " << vertices.size();
+}
+
+*/

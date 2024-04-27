@@ -42,7 +42,7 @@ typedef CGAL::Shape_detection::Torus<Traits>            Torus;
 using namespace std;
 
 #define DISTANCE_COULEURS 150.0 // entre 0 et 256
-#define DISTANCE_XYZ 0.08 // entre 0 et 1
+#define DISTANCE_XYZ 0.32 // entre 0 et 1
 #define NBPOINTSMIN 1000
 #define NBPOINTSMAX 6000
 #define DISTANCE_COULEURS_DOMINANTE 0.13 // entre 0 et 1

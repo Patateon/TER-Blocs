@@ -5,6 +5,7 @@ float dotProduct(const QVector3D& v1, const QVector3D& v2) {
     return v1.x() * v2.x() + v1.y() * v2.y() + v1.z() * v2.z();
 }
 
+
 QVector3D generate_unique_color(const std::vector<QVector3D>& couleurs) {
     // Générateur de nombres aléatoires
     std::random_device rd;
@@ -55,8 +56,6 @@ double calculate_linear_least_squares_fitting(const std::vector<Point_3>& cgal_p
     centroid = CGAL::centroid(cgal_points.begin(), cgal_points.end());
     return CGAL::linear_least_squares_fitting_3(cgal_points.begin(), cgal_points.end(), plane, centroid, CGAL::Dimension_tag<0>(), Kernel(), CGAL::Default_diagonalize_traits<double, 3>());
 }
-
-
 
 
 void NuageDePoint::analyseNuageDePoint(){
@@ -163,7 +162,7 @@ void NuageDePoint::analyseNuageDePoint(){
 
     // Créer une couleur unique pour chaque forme
     std::vector<QVector3D> colorsShape;
-    for (int i = 0; i < detected_shapes.size(); i++) {
+    for (uint i = 0; i < detected_shapes.size(); i++) {
         // Générer une couleur unique
         colorsShape.push_back(generate_unique_color(colorsShape));
     }
@@ -226,8 +225,8 @@ void NuageDePoint::analyseNuageDePoint(){
     }
 
     float moyDotProductNormals=0;
-    for(int i=0 ; i< moyNormalShape.size() ; i++){
-        for(int j =i+1; j< moyNormalShape.size() ;j++){
+    for(uint i=0 ; i< moyNormalShape.size() ; i++){
+        for(uint j =i+1; j< moyNormalShape.size() ;j++){
             float dotP=dotProduct(moyNormalShape[i] , moyNormalShape[j]);
             moyDotProductNormals+=dotP;
         }
@@ -257,11 +256,6 @@ void NuageDePoint::analyseNuageDePoint(){
         //pas de shape avec bcp de point
     }
 }
-
-
-
-
-
 
 
 /*
@@ -384,136 +378,3 @@ QVector3D getDominantColor(const QVector<QVector3D>& couleurs) {
 
     return couleurDominante;
 }
-void NuageDePoint::clearNuageDePoint() {
-    buildKdtree();
-    qDebug() << "Nombre de vertices avant nettoyage " << vertices.size();
-
-    Pwn_vector points;
-    Plane_3 plane;
-    Kernel::Point_3 centroid;
-
-    for(int i=0;i<vertices.size();i++) {
-        points.push_back(std::make_pair(Kernel::Point_3(vertices[i].x(),vertices[i].y(), vertices[i].z()), Kernel::Vector_3(normals[i].x(), normals[i].y(), normals[i].z())));
-    }
-    /*
-    qDebug() << "0 vert " << vertices[0];
-    const Point_with_normal& p = points[0];
-    QVector3D vertex(p.first.x(), p.first.y(), p.first.z());
-    qDebug() << "0 point " << vertex;
-*/
-    // Instantiate shape detection engine.
-    Efficient_ransac ransac;
-    // Provide input data.
-    ransac.set_input(points);
-    // Register planar shapes via template method.
-    ransac.add_shape_factory<Plane>();
-    // Detect registered shapes with default parameters.
-    // Set parameters for shape detection.
-    Efficient_ransac::Parameters parameters;
-    // Set probability to miss the largest primitive at each iteration.
-    parameters.probability = 0.05;
-    // Detect shapes with at least 200 points.
-    parameters.min_points = 28000;
-    // Set maximum Euclidean distance between a point and a shape.
-    parameters.epsilon = 0.004;
-    // Set maximum Euclidean distance between points to be clustered.
-    parameters.cluster_epsilon = 2;
-    // Set maximum normal deviation.
-    // 0.8 < dot(surface_normal, point_normal);
-    parameters.normal_threshold = 0.8;
-    // Detect shapes.
-    ransac.detect(parameters);
-
-    // Print number of detected shapes.
-    qDebug() << ransac.shapes().end() - ransac.shapes().begin()
-             << " shapes detected." ;
-
-    // Récupérer les formes détectées
-    const auto& detected_shapes = ransac.shapes();
-
-
-    Efficient_ransac::Shape_range::iterator it = ransac.shapes().begin();
-
-    std::vector<int> indices_to_erase;
-    while (it != ransac.shapes().end()) {
-        // Récupérer la forme détectée
-        boost::shared_ptr<Efficient_ransac::Shape> shape = *it;
-
-        // Utiliser Shape_base::info() pour imprimer les paramètres de la forme détectée
-        qDebug() << (*it)->info();
-        // Copy indices of assigned points to avoid modifying the original vector
-        auto indices = (*it)->indices_of_assigned_points();
-        //std::sort(indices.begin(), indices.end(), std::greater<int>());
-        /*
-        qDebug() << "index 0 vert" << vertices[indices[0]];
-        const Point_with_normal& p = points[indices[0]];
-        QVector3D vertex(p.first.x(), p.first.y(), p.first.z());
-        qDebug() << "index 0 point " << vertex;
-        */
-
-        for (auto index : indices) {
-            /*
-            // Find the vertex in the vertices vector
-            const Point_with_normal& p = points[index];
-            QVector3D vertex(p.first.x(), p.first.y(), p.first.z());
-            auto found_vertex = std::find(vertices.begin(), vertices.end(), vertex);
-
-
-            // Check if the vertex is found
-            if (found_vertex != vertices.end()) {
-                // Get the index of the found vertex
-                int vertex_index = std::distance(vertices.begin(), found_vertex);
-
-                // Erase elements from vectors based on the index
-                //vertices.erase(vertices.begin() + vertex_index);
-                //normals.erase(normals.begin() + vertex_index);
-                //colors.erase(colors.begin() + vertex_index);
-                colors[vertex_index] = QVector3D(1.0, 1.0, 1.0);
-            }
-            */
-            const Point_with_normal& p = points[index];
-            ANNpoint ann_point = annAllocPt(3);
-            ann_point[0]=p.first.x();
-            ann_point[1]=p.first.y();
-            ann_point[2]=p.first.z();
-            unsigned int nearest_index = kdtree.nearest(ann_point);
-            //qDebug() << "nearest index : " << nearest_index;
-            indices_to_erase.push_back(nearest_index);
-            //colors[nearest_index] = QVector3D(1.0, 1.0, 1.0);
-        }
-
-        // Increment shape iterator
-        it++;
-    }
-    // Sort the indices in descending order to ensure valid erasure
-    std::sort(indices_to_erase.rbegin(), indices_to_erase.rend());
-
-    // Erase elements from vectors using the stored indices
-    for (int i : indices_to_erase) {
-        vertices.erase(vertices.begin() + i);
-        normals.erase(normals.begin() + i);
-        colors.erase(colors.begin() + i);
-    }
-
-    qDebug() << "Nombre de vertices apres nettoyage " << vertices.size();
-}
-
-/*
-void NuageDePoint::clearNuageDePoint() {
-    qDebug() << "Nombre de vertices avant nettoyage " << vertices.size();
-    QVector3D dominantColor = getDominantColor(colors);
-    qDebug() << "Couleur dominante " << dominantColor.x()  << dominantColor.y () << dominantColor.z();
-    for(int i=0; i<vertices.size();){
-        float distance = euclidean_distance(dominantColor, colors[i]);
-        if(distance < DISTANCE_COULEURS_DOMINANTE){
-            vertices.removeAt(i);
-            colors.removeAt(i);
-            normals.removeAt(i);
-        } else {
-            i++;
-        }
-    }
-    qDebug() << "Nombre de vertices apres nettoyage " << vertices.size();
-}
-
-*/
