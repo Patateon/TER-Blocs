@@ -52,7 +52,6 @@ void NuageDePoint::performDelaunayTriangulation(const QVector<QVector3D>& vertic
     }
 }
 
-
 float euclidean_distance(const float p1, const float p2) {
     float dr = p1 - p2;
     return sqrt( dr*dr );
@@ -65,6 +64,49 @@ float euclidean_distance(const QVector3D& p1, const QVector3D& p2) {
     return sqrt(diffR * diffR + diffG * diffG + diffB * diffB);
 }
 
+struct QVector3DComparer {
+    bool operator()(const QVector3D& c1, const QVector3D& c2) const {
+        // Compare les coordonnées x, y, et z
+        if (c1.x() != c2.x()) return c1.x() < c2.x();
+        if (c1.y() != c2.y()) return c1.y() < c2.y();
+        return c1.z() < c2.z();
+    }
+};
+
+// Fonction pour trouver la couleur dominante
+QVector3D getDominantColor(const QVector<QVector3D>& couleurs) {
+    // Définir une carte pour compter les occurrences de chaque couleur
+    std::map<QVector3D, int, QVector3DComparer> compteurs;
+
+    // Itérer sur toutes les couleurs et les regrouper
+    for (const QVector3D& couleur : couleurs) {
+        // Vérifier si une couleur similaire est déjà présente dans la carte
+        bool couleurTrouvee = false;
+        for (auto& it : compteurs) {
+            if (euclidean_distance(couleur, it.first) < DISTANCE_COULEURS_DOMINANTE) { // Choisir une distance de seuil appropriée
+                it.second++;
+                couleurTrouvee = true;
+                break;
+            }
+        }
+        // Si la couleur n'a pas été trouvée, l'ajouter à la carte
+        if (!couleurTrouvee) {
+            compteurs[couleur] = 1;
+        }
+    }
+
+    // Trouver la couleur avec le compteur le plus élevé
+    QVector3D couleurDominante;
+    int maxCompteur = 0;
+    for (const auto& it : compteurs) {
+        if (it.second > maxCompteur) {
+            maxCompteur = it.second;
+            couleurDominante = it.first;
+        }
+    }
+
+    return couleurDominante;
+}
 
 NuageDePoint::NuageDePoint() {
     arrayBuf.create();
@@ -77,7 +119,6 @@ NuageDePoint::~NuageDePoint() {
     colorBuf.destroy();
     normalBuf.destroy();
 }
-
 
 void NuageDePoint::addVertices(QVector3D vertice){
     vertices.append(vertice);
@@ -396,7 +437,6 @@ void NuageDePoint::bindAndAllocateBuffer(){
     normalBuf.allocate(normals.data(), normals.size() * sizeof(QVector3D));
 }
 
-
 void NuageDePoint::drawGeometry(QOpenGLShaderProgram *program) {
 
     arrayBuf.bind();
@@ -424,7 +464,6 @@ void NuageDePoint::drawGeometry(QOpenGLShaderProgram *program) {
     program->disableAttributeArray(colorLocation);
     program->disableAttributeArray(normalLocation);
 }
-
 
 void NuageDePoint::clearNuageDePoint() {
     buildKdtree();
@@ -562,3 +601,17 @@ void NuageDePoint::clearNuageDePoint() {
 }
 
 */
+
+void NuageDePoint::computeBarycentre() {
+    QVector3D tmp = QVector3D();
+    int vertices_size = this->vertices.size();
+    for(int i = 0; i < vertices_size; i++){
+        tmp += this->vertices[i];
+    }
+    tmp *= (1.f / (float) vertices_size);
+    barycentre = tmp;
+}
+
+QVector3D NuageDePoint::getBarycentre() {
+    return barycentre;
+}

@@ -10,8 +10,6 @@
 #include "../headers/Camera.h"
 #include <GL/gl.h>
 
-#include <iostream>
-
 using namespace std;
 
 static int _spinning, _moving;
@@ -34,19 +32,26 @@ Camera::Camera () {
   
   trackball (curquat, 0.0, 0.0, 0.0, 0.0);
   x = 0.0; // Set the initial x position
-  y = 1.0; // Set the initial y position
-  z = 8.0; // Set the initial z position
+  y = 0.0; // Set the initial y position
+  z = 0.0; // Set the initial z position
   _zoom = 0.0;
 }
 
 
-QMatrix4x4 Camera::lookAt(QVector3D target) {
-    QVector3D cameraPos(x, y, z);
-    QVector3D up(0.0f, 1.0f, 0.0f);
+QMatrix4x4 Camera::lookAt(QVector3D target, QVector3D up) {
+    float nx, ny, nz;
+    this->getPos(nx, ny, nz);
+    QVector3D cameraPos(nx, ny, nz);
 
-    QMatrix4x4 view = QMatrix4x4();
+    QMatrix4x4 view;
+
+    view.translate(x, y, z);
+    view.translate(0.0, 0.0, -_zoom);
+
     view.lookAt(cameraPos, target, up);
+
     return view;
+}
 
     // // Calcule la direction de vue
     // QVector3D viewDirection = (target - cameraPos).normalized();
@@ -68,15 +73,7 @@ QMatrix4x4 Camera::lookAt(QVector3D target) {
     // curquat[1] = rotation.x();
     // curquat[2] = rotation.y();
     // curquat[3] = rotation.z();
-}
-
-
-
-
-
-
-
-
+// }
 
 
 QMatrix4x4 Camera::getProjectionMatrix() const {
@@ -104,19 +101,19 @@ void Camera::resize (int _W, int _H) {
 
 void Camera::initPos () {
   if (!ini) {
-  _spinning = spinning;
-  _moving = moving;;
-  _beginu = beginu;
-  _beginv = beginv;
-  _curquat[0] = curquat[0];
-  _curquat[1] = curquat[1];
-  _curquat[2] = curquat[2];
-  _curquat[3] = curquat[3];
-  _x = x;
-  _y = y;
-  _z = z;;
-  __zoom = _zoom;
-  ini = true;
+    _spinning = spinning;
+    _moving = moving;;
+    _beginu = beginu;
+    _beginv = beginv;
+    _curquat[0] = curquat[0];
+    _curquat[1] = curquat[1];
+    _curquat[2] = curquat[2];
+    _curquat[3] = curquat[3];
+    _x = x;
+    _y = y;
+    _z = z;;
+    __zoom = _zoom;
+    ini = true;
   } else {
     spinning = _spinning;
     moving = _moving;;
@@ -152,10 +149,10 @@ void Camera::beginRotate (int u, int v) {
 void Camera::rotate (int u, int v) {
   if (moving) {
     trackball(lastquat,
-	      (2.0 * beginu - W) / W,
-	      (H - 2.0 * beginv) / H,
-	      (2.0 * u - W) / W,
-	      (H - 2.0 * v) / H);
+          (2.0 * beginu - W) / W,
+          (H - 2.0 * beginv) / H,
+          (2.0 * u - W) / W,
+          (H - 2.0 * v) / H);
     beginu = u;
     beginv = v;
     spinning = 1;
@@ -175,14 +172,19 @@ void Camera::zoom (float z) {
 
 
 void Camera::apply () {
-  glLoadIdentity();
-  glTranslatef (x, y, z);
-  GLfloat m[4][4];
-  build_rotmatrix(m, curquat);
-  glTranslatef (0.0, 0.0, -_zoom);
-  glMultMatrixf(&m[0][0]);
+    glLoadIdentity();
+    glTranslatef (x, y, z);
+    GLfloat m[4][4];
+    build_rotmatrix(m, curquat);
+    glTranslatef (0.0, 0.0, -_zoom);
+    glMultMatrixf(&m[0][0]);
 }
 
+void Camera::setPos (float nx, float ny, float nz){
+    x = nx;
+    y = ny;
+    z = nz;
+}
 
 void Camera::getPos (float & X, float & Y, float & Z) {
   GLfloat m[4][4]; 

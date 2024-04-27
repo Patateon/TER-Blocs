@@ -12,6 +12,7 @@ int MainWidget::lastX = 0;
 int MainWidget::lastY = 0;
 int MainWidget::lastZoom = 0;
 bool MainWidget::fullScreen = false;
+bool MainWidget::mainCamera = true;
 
 MainWidget::~MainWidget()
 {
@@ -25,24 +26,25 @@ MainWidget::~MainWidget()
 //! [0]
 void MainWidget::mousePressEvent(QMouseEvent *e)
 {
-    mousePressPosition = QVector2D(e->position());
+    int x = e->position().x();
+    int y = e->position().y();
     switch (e->button()) {
     case Qt::LeftButton:
-        camera.beginRotate(e->position().x(), e->position().y());
+        camera.beginRotate(x, y);
         mouseMovePressed = false;
         mouseRotatePressed = true;
         mouseZoomPressed = false;
         break;
     case Qt::RightButton:
-        lastX = e->position().x();
-        lastY = e->position().y();
+        lastX = x;
+        lastY = y;
         mouseMovePressed = true;
         mouseRotatePressed = false;
         mouseZoomPressed = false;
         break;
     case Qt::MiddleButton:
         if (!mouseZoomPressed) {
-            lastZoom = e->position().y();
+            lastZoom = y;
             mouseMovePressed = false;
             mouseRotatePressed = false;
             mouseZoomPressed = true;
@@ -58,12 +60,13 @@ void MainWidget::mouseMoveEvent(QMouseEvent *event)
 {
     int x = event->position().x();
     int y = event->position().y();
+    float cameraSpeed = 10.0f;
 
     if (mouseRotatePressed) {
         camera.rotate(x, y);
     }
     else if (mouseMovePressed) {
-        camera.move((x - lastX) / static_cast<float>(SCREENWIDTH), (lastY - y) / static_cast<float>(SCREENHEIGHT), 0.0);
+        camera.move((x - lastX) / static_cast<float>(SCREENWIDTH) * cameraSpeed, (lastY - y) / static_cast<float>(SCREENHEIGHT), 0.0);
         lastX = x;
         lastY = y;
     }
@@ -87,6 +90,9 @@ void MainWidget::mouseReleaseEvent(QMouseEvent *e)
     QOpenGLWidget::mouseReleaseEvent(e);
 }
 
+// void MainWidget::wheelEvent(QWheelEvent * event){
+
+// }
 
 void MainWidget::keyPressEvent(QKeyEvent *event)
 {
@@ -121,17 +127,14 @@ void MainWidget::keyReleaseEvent(QKeyEvent *event)
         afficher_ndpComparaison=!afficher_ndpComparaison;
         update();
         break;
+    case Qt::Key_S:
+        mainCamera = !mainCamera;
+        break;
     default:
         QOpenGLWidget::keyReleaseEvent(event);
         break;
     }
 }
-
-
-
-
-
-
 //! [0]
 
 //! [1]
@@ -166,17 +169,25 @@ void MainWidget::initializeGL()
     //ndp->performDelaunayTriangulation(ndp->getVertices(),ndp->getTriangles());
     ndpComparaison= new NuageDePoint();
     ndpComparaison->clone(ndp);
-    // cameraTarget = QVector3D(0.0f, 0.0f, 0.0f);
+
+
+    currentNuageDePoint->computeBarycentre();
+    cameraTarget = currentNuageDePoint->getBarycentre();
+    qDebug()<<"Barycentre du ndg courant : "<<cameraTarget;
+
+    viewMatrix = QMatrix4x4();
+    camera.initPos();
+    camera.zoom(3);
     // updateCamera(cameraTarget);
     // float x,y,z;
     // camera.getPos(x,y,z);
     // qDebug()<<x<<" "<<y<<" "<<z;
     // camera.lookAt(target);
     // camera.getPos(x,y,z);
-   // qDebug()<<x<<" "<<y<<" "<<z;
-    camera.apply();
+    // qDebug()<<x<<" "<<y<<" "<<z;
+    // camera.apply();
     // camera.getPos(x,y,z);
-   // qDebug()<<x<<" "<<y<<" "<<z;
+    // qDebug()<<x<<" "<<y<<" "<<z;
 
     // Use QBasicTimer because its faster than QTimer
     timer.start(12, this);
@@ -229,6 +240,7 @@ void MainWidget::initTextures()
 void MainWidget::resizeGL(int w, int h)
 {
     camera.resize (w, h);
+    projectionMatrix = camera.getProjectionMatrix();
 }
 //! [5]
 
@@ -248,20 +260,31 @@ void MainWidget::paintGL()
     texture->bind();
     program.bind();
 
+    // Get camera position for view matrix computation and for lightnings computations
+    float x,y,z;
+    camera.getPos(x,y,z);
+    QVector3D cameraPosition;
+    cameraPosition = QVector3D(x, y, z);
 
     //! [6]
     // Calculate model view transformation
-    QMatrix4x4 matrix;
-    float x,y,z;
-    camera.getPos(x,y,z);
-    matrix.translate(x,y,z);
+    QMatrix4x4 modelMatrix;
+    // Compute view matrix
+    if (mainCamera){
+        // modelMatrix.translate(-cameraTarget);
+        viewMatrix = camera.lookAt(cameraTarget, cameraUp);
+    }else{
+        // modelMatrix.translate(-cameraTarget2);
+        viewMatrix = camera.lookAt(cameraTarget2, cameraUp);
+    }
 
-    // Update camera each tick
-    // updateCamera(cameraTarget);
+    qDebug()<<"Camera Position :"<<cameraPosition;
 
     // Set modelview-projection matrix
-    program.setUniformValue("mvp_matrix", camera.getProjectionMatrix() /** viewMatrix*/ * matrix);
-    program.setUniformValue("cameraPosition", QVector3D(x, y, z));
+    program.setUniformValue("model", modelMatrix);
+    program.setUniformValue("view", viewMatrix);
+    program.setUniformValue("projection", projectionMatrix);
+    program.setUniformValue("cameraPosition", cameraPosition);
     //! [6]
 
     // Use texture unit 0 which contains cube.png
@@ -310,16 +333,20 @@ void MainWidget::switchNuageDePoint(){
     currentNuageDePoint = allNuageDePoint[nextNuageDePointIndice];
     currentNuageDePoint->bindAndAllocateBuffer();
     nextNuageDePointIndice++;
-    update();/*
+    /*
     qDebug() << currentNuageDePoint->getVertices().size() ;
     qDebug() << currentNuageDePoint->getColors().size() ;
-    qDebug() << currentNuageDePoint->getNormals().size() ;*/
+    qDebug() << currentNuageDePoint->getNormals().size() ;
+    */
+    cameraTarget2 = currentNuageDePoint->getBarycentre();
+    update();
 }
 
 void MainWidget::parseNuageDePoint(){
     QVector<NuageDePoint *> NuageDePointSupplementaire = currentNuageDePoint->parseNDP();
     //QVector<NuageDePoint *> NuageDePointSupplementaire = currentNuageDePoint->parseNuageDePoint();
     for(NuageDePoint* ndp : NuageDePointSupplementaire) {
+        ndp->computeBarycentre();
         allNuageDePoint.append( ndp );
     }
 }
@@ -327,8 +354,4 @@ void MainWidget::parseNuageDePoint(){
 void MainWidget::analyseNuageDePoint(){
     currentNuageDePoint->analyseNuageDePoint();
 
-}
-
-void MainWidget::updateCamera(QVector3D target){
-    viewMatrix = camera.lookAt(target);
 }

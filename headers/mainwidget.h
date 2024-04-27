@@ -17,7 +17,6 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLTexture>
 
-
 class MainWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
     Q_OBJECT
@@ -30,6 +29,7 @@ protected:
     void mousePressEvent(QMouseEvent *e) override;
     void mouseReleaseEvent(QMouseEvent *e) override;
     void mouseMoveEvent(QMouseEvent *event) override;
+    // void wheelEvent(QMouseEvent *event) override;
     void timerEvent(QTimerEvent *e) override;
     void keyReleaseEvent(QKeyEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
@@ -67,7 +67,10 @@ private:
 
     Camera camera;
     QMatrix4x4 viewMatrix;
+    QMatrix4x4 projectionMatrix;
     QVector3D cameraTarget;
+    QVector3D cameraTarget2;
+    QVector3D cameraUp = QVector3D(0.0, 1.0, 0.0);
     static unsigned int SCREENWIDTH ;
     static unsigned int SCREENHEIGHT ;
     static bool mouseRotatePressed ;
@@ -75,6 +78,7 @@ private:
     static bool mouseZoomPressed ;
     static int lastX, lastY, lastZoom;
     static bool fullScreen ;
+    static bool mainCamera ;
 
 
     QVector2D mousePressPosition;

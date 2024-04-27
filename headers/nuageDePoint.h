@@ -97,6 +97,9 @@ public:
 
     Descripteur getDescripteur() const { return descripteur; }
 
+    void computeBarycentre();
+    QVector3D getBarycentre();
+
 private:
     BasicANNkdTree kdtree;
 
@@ -104,6 +107,7 @@ private:
     QVector<QVector3D> colors;
     QVector<QVector3D> normals;
     std::vector<std::vector<int>> triangles;
+    QVector3D barycentre;
 
 
     QOpenGLBuffer arrayBuf;
