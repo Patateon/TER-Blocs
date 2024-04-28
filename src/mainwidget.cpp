@@ -278,7 +278,7 @@ void MainWidget::paintGL()
         viewMatrix = camera.lookAt(cameraTarget2, cameraUp);
     }
 
-    qDebug()<<"Camera Position :"<<cameraPosition;
+    // qDebug()<<"Camera Position :"<<cameraPosition;
 
     // Set modelview-projection matrix
     program.setUniformValue("model", modelMatrix);
