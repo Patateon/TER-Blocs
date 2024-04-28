@@ -271,10 +271,10 @@ void MainWidget::paintGL()
     QMatrix4x4 modelMatrix;
     // Compute view matrix
     if (mainCamera){
-        // modelMatrix.translate(-cameraTarget);
+        modelMatrix.translate(-cameraTarget);
         viewMatrix = camera.lookAt(cameraTarget, cameraUp);
     }else{
-        // modelMatrix.translate(-cameraTarget2);
+        modelMatrix.translate(-cameraTarget2);
         viewMatrix = camera.lookAt(cameraTarget2, cameraUp);
     }
 

@@ -24,12 +24,12 @@ SOURCES += \
     ann/src/kd_util.cpp \
     ann/src/perf.cpp \
     src/analyseParCGAL.cpp \
+    src/camera.cpp \
     src/main.cpp \
     src/mainwidget.cpp \
     src/nuageDePoint.cpp \
     src/plyFile.cpp \
-    src/Camera.cpp \
-    src/Trackball.cpp \
+    src/trackball.cpp
 
 HEADERS += \
     ann/include/ANN/ANN.h \
@@ -44,13 +44,13 @@ HEADERS += \
     ann/src/kd_util.h \
     ann/src/pr_queue.h \
     ann/src/pr_queue_k.h \
+    headers/camera.h \
     headers/kdtree.h \
     headers/mainwidget.h \
     headers/nuageDePoint.h \
     headers/plyFile.h \
-    headers/Camera.h \
-    headers/Trackball.h \
     ANN/ANN.h \
+    headers/trackball.h
 
 RESOURCES += \
     shaders/fshader.glsl \

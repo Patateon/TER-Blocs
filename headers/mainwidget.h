@@ -5,7 +5,7 @@
 #define MAINWIDGET_H
 
 #include "plyFile.h"
-#include "Camera.h"
+#include "camera.h"
 
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>

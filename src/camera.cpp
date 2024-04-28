@@ -7,7 +7,7 @@
 // All rights reserved.
 // **************************************************
 
-#include "../headers/Camera.h"
+#include "../headers/camera.h"
 #include <GL/gl.h>
 
 using namespace std;
