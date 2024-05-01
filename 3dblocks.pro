@@ -49,7 +49,6 @@ HEADERS += \
     headers/mainwidget.h \
     headers/nuageDePoint.h \
     headers/plyFile.h \
-    ANN/ANN.h \
     headers/trackball.h
 
 RESOURCES += \
