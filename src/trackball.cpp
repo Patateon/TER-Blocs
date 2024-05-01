@@ -54,7 +54,7 @@
 #pragma warning (disable:4244)          /* disable bogus conversion warnings */
 #endif
 #include <math.h>
-#include "../headers/Trackball.h"
+#include "../headers/trackball.h"
 
 /*
  * This size should really be based on the distance from the center of
