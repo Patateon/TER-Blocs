@@ -11,7 +11,7 @@
 
 #include <QVector3D>
 #include <QMatrix4x4>
-#include "Trackball.h"
+#include "trackball.h"
 
 class Camera {
 public:
