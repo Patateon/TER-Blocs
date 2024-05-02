@@ -4,7 +4,10 @@
 #include <vector>
 #include <QOpenGLBuffer>
 #include <QOpenGLShaderProgram>
-
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <sstream>
 class Mesh
 {
 private:
@@ -42,10 +45,10 @@ public:
     std::vector<std::vector<unsigned int>> triangles() const { return m_triangles; }
     void triangles(std::vector<std::vector<unsigned int>> triangles) {m_triangles = triangles; }
     void loadOffFile(const std::string& filename, Mesh *mesh){}
-    void addVertice(QVector3D vertice){}
-    void addColor(QVector3D color){}
-    void addNormal(QVector3D normal){}
-    void addTriangle(std::vector<unsigned int> triangle){}
+    void addVertice(QVector3D vertice);
+    void addColor(QVector3D color);
+    void addNormal(QVector3D normal);
+    void addTriangle(std::vector<unsigned int> triangle);
 
 
 };

@@ -87,7 +87,7 @@ void Mesh::clear() {
     triangleBuf.destroy();
 }
 
-void Mesh::loadOffFile(const std::string& filename, Mesh *mesh) {
+void loadOffFile(const std::string& filename, Mesh *mesh) {
     std::ifstream file(filename);
 
     std::string line;
@@ -153,24 +153,22 @@ void Mesh::loadOffFile(const std::string& filename, Mesh *mesh) {
     }
 
     file.close();
-    m_vertices=vertices;
-    m_colors=colors;
-    m_triangles=triangles;
-    m_normals=normals;
     qDebug() << "File loaded successfully: " << QString::fromStdString(filename);
 
 }
 
-void addVertice(QVector3D vertice){
+void Mesh::addVertice(QVector3D vertice){
     m_vertices.append(vertice);
 }
 
-void addColor(QVector3D color){
+void Mesh::addColor(QVector3D color){
     m_colors.append(color);
 }
-void addNormal(QVector3D normal){
+
+void Mesh::addNormal(QVector3D normal){
     m_normals.append(normal);
 }
-void addTriangle(std::vector<unsigned int> triangle){
-    m_triangles.append(triangle);
+
+void Mesh::addTriangle(std::vector<unsigned int> triangle){
+    m_triangles.push_back(triangle);
 }
