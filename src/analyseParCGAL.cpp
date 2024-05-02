@@ -441,7 +441,13 @@ void NuageDePoint::buildMesh() {
             std::vector<std::size_t> vertex_indices;
             do {
                 Polyhedron::Vertex_handle v = j->vertex();v = j->vertex();
-                std::size_t index = v->index();
+                std::size_t index = 0;
+                for (Polyhedron::Vertex_iterator vi = output_mesh.vertices_begin(); vi != output_mesh.vertices_end(); ++vi) {
+                    if (v == vi) {
+                        break;
+                    }
+                    ++index;
+                }
                 vertex_indices.push_back(index);
                 triangleColor += colors[index];
             } while (++j != end);
