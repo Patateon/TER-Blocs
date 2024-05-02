@@ -17,6 +17,8 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLTexture>
 
+
+
 class MainWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
     Q_OBJECT

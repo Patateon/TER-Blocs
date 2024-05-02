@@ -5,6 +5,7 @@
 
 #include <headers/mesh.h>
 
+
 unsigned int MainWidget::SCREENWIDTH = 640;
 unsigned int MainWidget::SCREENHEIGHT = 480;
 bool MainWidget::mouseRotatePressed = false;
