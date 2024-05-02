@@ -9,7 +9,7 @@ class Mesh
 {
 private:
     QVector<QVector3D> m_vertices;
-    QVector<QVector3D> m_colors;
+    QVector<QVector3D> m_colors;//couleur de triangle dans un OFF
     QVector<QVector3D> m_normals;
     std::vector<std::vector<unsigned int>> m_triangles;
 
@@ -41,6 +41,7 @@ public:
 
     std::vector<std::vector<unsigned int>> triangles() const { return m_triangles; }
     void triangles(std::vector<std::vector<unsigned int>> triangles) {m_triangles = triangles; }
+    void loadOffFile(const std::string& filename, Nesh *mesh){}
 };
 
 #endif // MESH_H
