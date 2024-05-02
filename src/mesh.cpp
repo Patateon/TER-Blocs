@@ -87,7 +87,7 @@ void Mesh::clear() {
     triangleBuf.destroy();
 }
 
-void Mesh::loadOffFile(const std::string& filename, Nesh *mesh) {
+void Mesh::loadOffFile(const std::string& filename, Mesh *mesh) {
     std::ifstream file(filename);
 
     std::string line;
@@ -127,7 +127,7 @@ void Mesh::loadOffFile(const std::string& filename, Nesh *mesh) {
         } else if (isReadingVertices && count_vertex < nbVertices) {
             float x, y, z;
             iss >> x >> y >> z;
-            vertices.push_back(QVector3D(x, y, z));
+            mesh->addVertice(QVector3D(x,y,z));
             count_vertex++;
         } else if (isReadingVertices && count_vertex == nbVertices && count_face < nbFaces) {
             int vertexCount;
@@ -136,16 +136,16 @@ void Mesh::loadOffFile(const std::string& filename, Nesh *mesh) {
                 int v1, v2, v3;
                 iss >> v1 >> v2 >> v3;
                 std::vector<unsigned int> triangleIndex = {v1, v2, v3};
-                triangles.push_back(triangleIndex);
+                mesh->addTriangle(triangleIndex);
                 QVector3D v1v2 = vertices[v2] - vertices[v1];
                 QVector3D v1v3 = vertices[v3] - vertices[v1];
                 QVector3D normal = QVector3D::crossProduct(v1v2, v1v3).normalized();
-                normals.push_back(normal);
+                mesh->addNormal(normal);
                 float r = 1.0, g = 1.0, b = 1.0;
                 if (iss >> r >> g >> b) {
-                    colors.push_back(QVector3D(r / 255.0f, g / 255.0f, b / 255.0f));
+                    mesh->addColor(QVector3D(r / 255.0f, g / 255.0f, b / 255.0f));
                 } else {
-                    colors.push_back(QVector3D(1.0f, 1.0f, 1.0f));
+                    mesh->addColor(QVector3D(1.0,1.0,1.0));
                 }
                 count_face++;
             }
@@ -161,3 +161,16 @@ void Mesh::loadOffFile(const std::string& filename, Nesh *mesh) {
 
 }
 
+void addVertice(QVector3D vertice){
+    m_vertices.append(vertice);
+}
+
+void addColor(QVector3D color){
+    m_colors.append(color);
+}
+void addNormal(QVector3D normal){
+    m_normals.append(normal);
+}
+void addTriangle(std::vector<unsigned int> triangle){
+    m_triangles.append(triangle);
+}
