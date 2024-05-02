@@ -3,6 +3,8 @@
 
 #include "../headers/mainwidget.h"
 
+#include <headers/mesh.h>
+
 unsigned int MainWidget::SCREENWIDTH = 640;
 unsigned int MainWidget::SCREENHEIGHT = 480;
 bool MainWidget::mouseRotatePressed = false;
@@ -130,6 +132,9 @@ void MainWidget::keyReleaseEvent(QKeyEvent *event)
     case Qt::Key_S:
         mainCamera = !mainCamera;
         break;
+    case Qt::Key_M:
+        currentNuageDePoint->buildMesh();
+        break;
     default:
         QOpenGLWidget::keyReleaseEvent(event);
         break;
@@ -178,16 +183,6 @@ void MainWidget::initializeGL()
     viewMatrix = QMatrix4x4();
     camera.initPos();
     camera.zoom(3);
-    // updateCamera(cameraTarget);
-    // float x,y,z;
-    // camera.getPos(x,y,z);
-    // qDebug()<<x<<" "<<y<<" "<<z;
-    // camera.lookAt(target);
-    // camera.getPos(x,y,z);
-    // qDebug()<<x<<" "<<y<<" "<<z;
-    // camera.apply();
-    // camera.getPos(x,y,z);
-    // qDebug()<<x<<" "<<y<<" "<<z;
 
     // Use QBasicTimer because its faster than QTimer
     timer.start(12, this);

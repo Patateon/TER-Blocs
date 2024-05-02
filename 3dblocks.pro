@@ -27,6 +27,7 @@ SOURCES += \
     src/camera.cpp \
     src/main.cpp \
     src/mainwidget.cpp \
+    src/mesh.cpp \
     src/nuageDePoint.cpp \
     src/plyFile.cpp \
     src/trackball.cpp
@@ -47,6 +48,7 @@ HEADERS += \
     headers/camera.h \
     headers/kdtree.h \
     headers/mainwidget.h \
+    headers/mesh.h \
     headers/nuageDePoint.h \
     headers/plyFile.h \
     headers/trackball.h
@@ -57,9 +59,17 @@ RESOURCES += \
     shaders/gshader.glsl \
     data/meshcolor.ply \
 
+# Nécessaire pour la reconstruction par poisson
+DEFINES += CGAL_EIGEN3_ENABLED
+
 INCLUDEPATH += /usr/include
+
+# Ajout de ANN (KD Tree)
 INCLUDEPATH += $$PWD/ann/include
+# Ajout de CGAL (Traitement 3D)
 INCLUDEPATH += $$PWD/external/CGAL-5.6.1
+# Ajout de Eigen (pour poisson)
+INCLUDEPATH += $$PWD/external/eigen-3.4.0
 
 win32: LIBS += -lopengl32
 unix: LIBS += -lGL -lgmp -lmpfr
