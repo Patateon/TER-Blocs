@@ -87,75 +87,75 @@ void Mesh::clear() {
     triangleBuf.destroy();
 }
 
-void loadOffFile(const std::string& filename, Mesh *mesh) {
-    std::ifstream file(filename);
+// void loadOffFile(const std::string& filename, Mesh *mesh) {
+//     std::ifstream file(filename);
 
-    std::string line;
-    if (!file.is_open()) {
-        qDebug() << "Failed to open .off file";
-        return;
-    }
+//     std::string line;
+//     if (!file.is_open()) {
+//         qDebug() << "Failed to open .off file";
+//         return;
+//     }
 
-    //Dans off sommets , indices triangles et couleur triangle
-    int nbVertices = 0;
-    int nbFaces = 0;
-    QVector<QVector3D> vertices;
-    QVector<QVector3D> colors;
-    std::vector<std::vector<unsigned int>>  triangles;
-    QVector<QVector3D> normals;
-    bool isReadingVertices = false;
-    int count_vertex = 0;
-    int count_face = 0;
+//     //Dans off sommets , indices triangles et couleur triangle
+//     int nbVertices = 0;
+//     int nbFaces = 0;
+//     QVector<QVector3D> vertices;
+//     QVector<QVector3D> colors;
+//     std::vector<std::vector<unsigned int>>  triangles;
+//     QVector<QVector3D> normals;
+//     bool isReadingVertices = false;
+//     int count_vertex = 0;
+//     int count_face = 0;
 
-    //Lecture
-    while (std::getline(file, line)) {
-        std::istringstream iss(line);
-        std::string keyword;
-        if (!isReadingVertices)
-            iss >> keyword;
+//     //Lecture
+//     while (std::getline(file, line)) {
+//         std::istringstream iss(line);
+//         std::string keyword;
+//         if (!isReadingVertices)
+//             iss >> keyword;
 
-        if (keyword == "OFF") {
-            isReadingVertices = true;
-        } else if (isReadingVertices && nbVertices == 0) {
-            //Lecture du nombre de sommets et triangles
-            iss >> nbVertices;
-            iss >> nbFaces;
-            vertices.reserve(nbVertices);
-            normals.reserve(nbFaces);
-            colors.reserve(nbFaces);
-            triangles.reserve(nbFaces);
-        } else if (isReadingVertices && count_vertex < nbVertices) {
-            float x, y, z;
-            iss >> x >> y >> z;
-            mesh->addVertice(QVector3D(x,y,z));
-            count_vertex++;
-        } else if (isReadingVertices && count_vertex == nbVertices && count_face < nbFaces) {
-            int vertexCount;
-            iss >> vertexCount;
-            if (vertexCount == 3) {
-                int v1, v2, v3;
-                iss >> v1 >> v2 >> v3;
-                std::vector<unsigned int> triangleIndex = {v1, v2, v3};
-                mesh->addTriangle(triangleIndex);
-                QVector3D v1v2 = vertices[v2] - vertices[v1];
-                QVector3D v1v3 = vertices[v3] - vertices[v1];
-                QVector3D normal = QVector3D::crossProduct(v1v2, v1v3).normalized();
-                mesh->addNormal(normal);
-                float r = 1.0, g = 1.0, b = 1.0;
-                if (iss >> r >> g >> b) {
-                    mesh->addColor(QVector3D(r / 255.0f, g / 255.0f, b / 255.0f));
-                } else {
-                    mesh->addColor(QVector3D(1.0,1.0,1.0));
-                }
-                count_face++;
-            }
-        }
-    }
+//         if (keyword == "OFF") {
+//             isReadingVertices = true;
+//         } else if (isReadingVertices && nbVertices == 0) {
+//             //Lecture du nombre de sommets et triangles
+//             iss >> nbVertices;
+//             iss >> nbFaces;
+//             vertices.reserve(nbVertices);
+//             normals.reserve(nbFaces);
+//             colors.reserve(nbFaces);
+//             triangles.reserve(nbFaces);
+//         } else if (isReadingVertices && count_vertex < nbVertices) {
+//             float x, y, z;
+//             iss >> x >> y >> z;
+//             mesh->addVertice(QVector3D(x,y,z));
+//             count_vertex++;
+//         } else if (isReadingVertices && count_vertex == nbVertices && count_face < nbFaces) {
+//             int vertexCount;
+//             iss >> vertexCount;
+//             if (vertexCount == 3) {
+//                 int v1, v2, v3;
+//                 iss >> v1 >> v2 >> v3;
+//                 std::vector<unsigned int> triangleIndex = {v1, v2, v3};
+//                 mesh->addTriangle(triangleIndex);
+//                 QVector3D v1v2 = vertices[v2] - vertices[v1];
+//                 QVector3D v1v3 = vertices[v3] - vertices[v1];
+//                 QVector3D normal = QVector3D::crossProduct(v1v2, v1v3).normalized();
+//                 mesh->addNormal(normal);
+//                 float r = 1.0, g = 1.0, b = 1.0;
+//                 if (iss >> r >> g >> b) {
+//                     mesh->addColor(QVector3D(r / 255.0f, g / 255.0f, b / 255.0f));
+//                 } else {
+//                     mesh->addColor(QVector3D(1.0,1.0,1.0));
+//                 }
+//                 count_face++;
+//             }
+//         }
+//     }
 
-    file.close();
-    qDebug() << "File loaded successfully: " << QString::fromStdString(filename);
+//     file.close();
+//     qDebug() << "File loaded successfully: " << QString::fromStdString(filename);
 
-}
+// }
 
 void Mesh::addVertice(QVector3D vertice){
     m_vertices.append(vertice);

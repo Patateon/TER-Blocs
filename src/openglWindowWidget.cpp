@@ -150,6 +150,11 @@ void OpenGLWindowWidget::keyReleaseEvent(QKeyEvent *event)
         break;
     case Qt::Key_S:
         mainCamera = !mainCamera;
+        update();
+        break;
+    case Qt::Key_M:
+        fileMesh = QFileDialog::getSaveFileName(this, tr("Open OFF File"), "../TER-Blocs/data", tr("OFF Files (*.off)"));
+        currentNuageDePoint->buildMesh(fileMesh.toStdString());
         break;
     default:
         QOpenGLWidget::keyReleaseEvent(event);
@@ -292,6 +297,7 @@ void OpenGLWindowWidget::openPlyFileNuageDePoint()
 {
     // Delete any existing allocated memory to prevent memory leaks
     //a faire
+    qDebug()<< "Try to open...";
     NuageDePoint* previousNuageDePoint=ndp;
     NuageDePoint* previousNuageDePointComp=ndpComparaison;
     PlyFile* previousPly=ply;
@@ -327,11 +333,11 @@ void OpenGLWindowWidget::openPlyFileNuageDePoint()
     camera.zoom(3);
 
     // Delete the previous allocated memory
-    delete previousNuageDePointComp;
-    delete previousPly;
-    for (NuageDePoint* ndp : previousAllNuageDePoint) {
-        delete ndp;
-    }
+    // delete previousNuageDePointComp;
+    // delete previousPly;
+    // for (NuageDePoint* pndp : previousAllNuageDePoint) {
+    //     delete pndp;
+    // }
 
     update(); // Trigger a repaint after opening the file
     qDebug() << "everything's fine in opening PLY";
