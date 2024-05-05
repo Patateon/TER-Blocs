@@ -30,6 +30,7 @@ private:
     QLabel *parseLabel;
     QLabel *analyseLabel;
     QLabel *compareNDPLabel;
+    QLabel *meshPoissonLabel;
 
     QPushButton *openNDPButton;
     QPushButton *saveNDPButton;
@@ -39,6 +40,8 @@ private:
     QPushButton* parseButton;
     QPushButton* analyseButton;
     QPushButton* compareNDPButton;
+    QPushButton* meshPoissonButton;
+    QPushButton* centerCameraButton;
     OpenGLWindowWidget *openGLWidget;
 };
 

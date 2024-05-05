@@ -76,7 +76,7 @@ private:
 
     QOpenGLTexture *texture = nullptr;
 
-    QString fileMesh;
+    //QString fileMesh;
 
     Camera camera;
     QMatrix4x4 viewMatrix;
@@ -105,6 +105,8 @@ public slots:
     void handleParseNuageDePoint();
     void handleAnalyseNuageDePoint();
     void handleCompareNuageDePoint();
+    void handleSaveMeshPoisson();
+    void handleSwitchCamera();
 
 
 };

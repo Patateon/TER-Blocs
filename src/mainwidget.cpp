@@ -12,16 +12,19 @@ MainWidget::MainWidget(QWidget *parent)
     parseButton = new QPushButton("Parse", this);
     analyseButton = new QPushButton("Analyse (not working)", this);
     compareNDPButton = new QPushButton("Compare", this);
+    centerCameraButton = new QPushButton("Centrer la camera (ON/OFF)", this);
+    meshPoissonButton = new QPushButton("Save as a mesh", this);
     openGLWidget = new OpenGLWindowWidget(this);
 
     openNDPLabel = new QLabel("Ouvre un fichier PLY contenant un nuage de point", this);
     saveNDPLabel = new QLabel("Sauvegarde le nuage de point actuel", this);
     deleteLabel = new QLabel("Supprime le nuage de point actuel", this);
     clearLabel = new QLabel("Réduit le nombre de point du NDP (en enlevant les points appartenants au mur)", this);
-    switchLabel = new QLabel("Switch to the next point cloud", this);
+    switchLabel = new QLabel("Switch au prochain NDP du parse", this);
     parseLabel = new QLabel("Parse le nuage de point actuel (kmean : prend du temps)", this);
     analyseLabel = new QLabel("Analyse le type de prise du NDP actuel (not working yet)", this);
     compareNDPLabel = new QLabel("Compare avec le nuage de point avant Reduce/Parsing", this);
+    meshPoissonLabel = new QLabel("Transforme le nuage de point en maillage par Poisson (et save en off)", this);
 
     // Set word wrap property to true = elargie pas le coté gauche
     openNDPLabel->setWordWrap(true);
@@ -32,6 +35,7 @@ MainWidget::MainWidget(QWidget *parent)
     parseLabel->setWordWrap(true);
     analyseLabel->setWordWrap(true);
     compareNDPLabel->setWordWrap(true);
+    meshPoissonLabel->setWordWrap(true);
 
     QHBoxLayout *mainLayout = new QHBoxLayout;
     QVBoxLayout *buttonLayout = new QVBoxLayout;
@@ -39,6 +43,7 @@ MainWidget::MainWidget(QWidget *parent)
     buttonLayout->addWidget(openNDPButton);
     buttonLayout->addWidget(compareNDPLabel);
     buttonLayout->addWidget(compareNDPButton);
+    buttonLayout->addWidget(centerCameraButton);
     buttonLayout->addWidget(saveNDPLabel);
     buttonLayout->addWidget(saveNDPButton);
     buttonLayout->addWidget(deleteLabel);
@@ -51,6 +56,8 @@ MainWidget::MainWidget(QWidget *parent)
     buttonLayout->addWidget(switchButton);
     buttonLayout->addWidget(analyseLabel);
     buttonLayout->addWidget(analyseButton);
+    buttonLayout->addWidget(meshPoissonLabel);
+    buttonLayout->addWidget(meshPoissonButton);
     buttonLayout->addStretch(); // Add stretch to push buttons to the top
     mainLayout->addLayout(buttonLayout, 1); // Buttons occupy 1/6 of the width
 
@@ -66,6 +73,10 @@ MainWidget::MainWidget(QWidget *parent)
     connect(parseButton, &QPushButton::clicked, openGLWidget, &OpenGLWindowWidget::handleParseNuageDePoint);
     connect(analyseButton, &QPushButton::clicked, openGLWidget, &OpenGLWindowWidget::handleAnalyseNuageDePoint);
     connect(compareNDPButton, &QPushButton::clicked, openGLWidget, &OpenGLWindowWidget::handleCompareNuageDePoint);
+    connect(meshPoissonButton, &QPushButton::clicked, openGLWidget, &OpenGLWindowWidget::handleSaveMeshPoisson);
+    connect(centerCameraButton, &QPushButton::clicked, openGLWidget, &OpenGLWindowWidget::handleSwitchCamera);
+
+
     connect(openGLWidget, &OpenGLWindowWidget::compareButtonColorChanged, this, [this](bool green) {
         if (green) {
             compareNDPButton->setStyleSheet("background-color: green;");

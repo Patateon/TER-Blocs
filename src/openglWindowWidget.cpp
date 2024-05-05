@@ -125,6 +125,7 @@ void OpenGLWindowWidget::keyPressEvent(QKeyEvent *event)
 
 void OpenGLWindowWidget::keyReleaseEvent(QKeyEvent *event)
 {
+    QString fileMesh;
     switch (event->key()) {
     case Qt::Key_O:
         saveCurrentNuageDePoint();
@@ -459,3 +460,29 @@ void OpenGLWindowWidget::handleCompareNuageDePoint(){
     emit compareButtonColorChanged(afficher_ndpComparaison);
     update();
 }
+void OpenGLWindowWidget::handleSaveMeshPoisson(){
+    // Calculate the position of the label to center it
+    actionLabel->setText("Maillage par Poisson ..");
+    int labelX = (parentWidget()->width() - actionLabel->width()) / 2;
+    int labelY = (parentWidget()->height() - actionLabel->height()) / 2;
+    actionLabel->move(labelX, labelY);
+    actionLabel->show();
+
+    QCoreApplication::processEvents();
+    QString fileMesh = QFileDialog::getSaveFileName(this, tr("Open OFF File"), "../TER-Blocs/data", tr("OFF Files (*.off)"));
+    if(fileMesh.isNull()) {
+        qDebug() << "No file selected. Exiting initialization.";
+        actionLabel->hide();
+        return;
+    }
+
+    currentNuageDePoint->buildMesh(fileMesh.toStdString());
+    actionLabel->hide();
+}
+void OpenGLWindowWidget::handleSwitchCamera(){
+    mainCamera = !mainCamera;
+    update();
+}
+
+
+
