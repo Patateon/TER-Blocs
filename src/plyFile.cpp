@@ -10,7 +10,7 @@
 #include <iostream>
 
 PlyFile::PlyFile(){};
-
+PlyFile::~PlyFile(){};
 void PlyFile::loadPlyFile(const std::string& filename, NuageDePoint *ndp) {
 
     std::ifstream file(filename);
