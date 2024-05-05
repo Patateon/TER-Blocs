@@ -14,7 +14,7 @@ typedef Kernel::Vector_3 Vector3D;
 typedef std::pair<Point3D, Vector3D> Pwn;
 typedef CGAL::Polyhedron_3<Kernel> Polyhedron;
 
-
+#include <CGAL/Surface_mesh/IO/OFF.h>
 #include <headers/mesh.h>
 #include <CGAL/Simple_cartesian.h>
 #include <iostream>
@@ -399,7 +399,7 @@ QVector3D getDominantColor(const QVector<QVector3D>& couleurs) {
     return couleurDominante;
 }
 
-void NuageDePoint::buildMesh() {
+void NuageDePoint::buildMesh(const std::string& filename) {
     qDebug()<<"Starting building mesh ...";
 
     qDebug()<<"Pair building ...";
@@ -423,44 +423,46 @@ void NuageDePoint::buildMesh() {
 
         qDebug()<<"Surface reconstruction done !";
         qDebug()<<"Mesh writing in off ...";
-        std::ofstream out("data/test.off");
 
-        out << "OFF\n";
-        out << output_mesh.size_of_vertices() << " " << output_mesh.size_of_facets() << " 0\n";
-        for (const auto& point : points) {
-            out << point.first.x() << " " << point.first.y() << " " << point.first.z() << "\n";
-        }
-        std::vector<std::vector<std::size_t>> triangle_vertex_indices;
-        for (Facet_iterator facet = output_mesh.facets_begin(); facet != output_mesh.facets_end(); ++facet) {
-            Halfedge_facet_circulator j = facet->facet_begin();
-            Halfedge_facet_circulator end = j;
-            std::size_t n = circulator_size(j);
-            CGAL_assertion(n >= 3);
+        std::ofstream out(filename);
+        out << output_mesh;
 
-            QVector3D triangleColor(0, 0, 0);
-            std::vector<std::size_t> vertex_indices;
-            do {
-                Polyhedron::Vertex_handle v = j->vertex();v = j->vertex();
-                std::size_t index = 0;
-                for (Polyhedron::Vertex_iterator vi = output_mesh.vertices_begin(); vi != output_mesh.vertices_end(); ++vi) {
-                    if (v == vi) {
-                        break;
-                    }
-                    ++index;
-                }
-                vertex_indices.push_back(index);
-                triangleColor += colors[index];
-            } while (++j != end);
-            triangleColor.setX(triangleColor.x() / 3);
-            triangleColor.setY(triangleColor.y() / 3);
-            triangleColor.setZ(triangleColor.z() / 3);
-            triangle_vertex_indices.push_back(vertex_indices);
-            out << "3";
-            for (std::size_t i = 0; i < vertex_indices.size(); ++i) {
-                out << " " << vertex_indices[i];
-            }
-            out << " " << triangleColor.x() << " " << triangleColor.y() << " " << triangleColor.z() << "\n";
-        }
+        // out << "OFF\n";
+        // out << output_mesh.size_of_vertices() << " " << output_mesh.size_of_facets() << " 0\n";
+        // for (const auto& point : points) {
+        //     out << point.first.x() << " " << point.first.y() << " " << point.first.z() << "\n";
+        // }
+        // std::vector<std::vector<std::size_t>> triangle_vertex_indices;
+        // for (Facet_iterator facet = output_mesh.facets_begin(); facet != output_mesh.facets_end(); ++facet) {
+        //     Halfedge_facet_circulator j = facet->facet_begin();
+        //     Halfedge_facet_circulator end = j;
+        //     std::size_t n = circulator_size(j);
+        //     CGAL_assertion(n >= 3);
+
+        //     QVector3D triangleColor(0, 0, 0);
+        //     std::vector<std::size_t> vertex_indices;
+        //     do {
+        //         Polyhedron::Vertex_handle v = j->vertex();v = j->vertex();
+        //         std::size_t index = 0;
+        //         for (Polyhedron::Vertex_iterator vi = output_mesh.vertices_begin(); vi != output_mesh.vertices_end(); ++vi) {
+        //             if (v == vi) {
+        //                 break;
+        //             }
+        //             ++index;
+        //         }
+        //         vertex_indices.push_back(index);
+        //         triangleColor += colors[index];
+        //     } while (++j != end);
+        //     triangleColor.setX(triangleColor.x() / 3);
+        //     triangleColor.setY(triangleColor.y() / 3);
+        //     triangleColor.setZ(triangleColor.z() / 3);
+        //     triangle_vertex_indices.push_back(vertex_indices);
+        //     out << "3";
+        //     for (std::size_t i = 0; i < vertex_indices.size(); ++i) {
+        //         out << " " << vertex_indices[i];
+        //     }
+        //     out << " " << triangleColor.x() << " " << triangleColor.y() << " " << triangleColor.z() << "\n";
+        // }
 
         qDebug()<<"Mesh written !";
     }

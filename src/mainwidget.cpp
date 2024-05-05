@@ -134,7 +134,8 @@ void MainWidget::keyReleaseEvent(QKeyEvent *event)
         mainCamera = !mainCamera;
         break;
     case Qt::Key_M:
-        currentNuageDePoint->buildMesh();
+        fileMesh = QFileDialog::getOpenFileName(this, tr("Open OFF File"), "../TER-Blocs/data", tr("OFF Files (*.off)"));
+        currentNuageDePoint->buildMesh(fileMesh.toStdString());
         break;
     default:
         QOpenGLWidget::keyReleaseEvent(event);

@@ -87,7 +87,7 @@ public:
     void bindAndAllocateBuffer();
     void buildKdtree();
 
-    void buildMesh();
+    void buildMesh(const std::string& filename);
 
     BasicANNkdTree getKdTree(){return kdtree;}
 
