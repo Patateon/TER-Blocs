@@ -28,6 +28,7 @@ SOURCES += \
     src/main.cpp \
     src/mainwidget.cpp \
     src/nuageDePoint.cpp \
+    src/openglWindowWidget.cpp \
     src/plyFile.cpp \
     src/trackball.cpp
 
@@ -46,10 +47,11 @@ HEADERS += \
     ann/src/pr_queue_k.h \
     headers/camera.h \
     headers/kdtree.h \
-    headers/mainwidget.h \
     headers/nuageDePoint.h \
+    headers/openglWindowWidget.h \
     headers/plyFile.h \
-    headers/trackball.h
+    headers/trackball.h \
+    headers/mainwidget.h
 
 RESOURCES += \
     shaders/fshader.glsl \

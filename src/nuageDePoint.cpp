@@ -135,14 +135,14 @@ QVector<NuageDePoint *> NuageDePoint::parseNuageDePoint() {
         }
         if( sousNuageDePoint->getVertices().size() > NBPOINTSMIN) {
             allNuageDePoint.append(sousNuageDePoint);
-            qDebug() << "Sous NuageDePoint n: " << allNuageDePoint.size() << "de taille : " << allNuageDePoint[allNuageDePoint.size()-1]->getVertices().size();
+            //qDebug() << "Sous NuageDePoint n: " << allNuageDePoint.size() << "de taille : " << allNuageDePoint[allNuageDePoint.size()-1]->getVertices().size();
         }
         else{
             delete sousNuageDePoint;
         }
     }
-    qDebug() << "Nombre de sous NuageDePoint par couleur " << allNuageDePoint.size();
-    qDebug() << "Nombre de vertices du premier sous NuageDePoint " << allNuageDePoint[0]->getVertices().size();
+    //qDebug() << "Nombre de sous NuageDePoint par couleur " << allNuageDePoint.size();
+    //qDebug() << "Nombre de vertices du premier sous NuageDePoint " << allNuageDePoint[0]->getVertices().size();
     return allNuageDePoint;
 }
 
@@ -176,7 +176,7 @@ QVector<QVector3D> initializeCentroidsKMeansPlusPlus(const QVector<QVector3D>& p
     int firstIndex = rand() % points.size();
     centroids.push_back(points[firstIndex]);
     centroidColors.push_back(color[firstIndex]);
-    qDebug()<<points.size();
+    //qDebug()<<points.size();
     //Sélectionner les k-1 centroïdes restants, le plus loin d'un autre centroide
     while (centroids.size() < k) {
         QVector<float> distancesSquared(points.size(), std::numeric_limits<float>::max());
@@ -224,7 +224,7 @@ QVector<NuageDePoint*> NuageDePoint::parseNDP() {
 
     // Algorithme K-means
     bool converged = false;
-    qDebug()<<"Entree boucle";
+    //qDebug()<<"Entree boucle";
     while (!converged) {
         std::vector<int> mark(getVertices().size(), 0);
         std::vector<int> classe(getVertices().size(), -1);
@@ -285,7 +285,7 @@ QVector<NuageDePoint*> NuageDePoint::parseNDP() {
         if(nbNonAssignes>seuilNbNonAssignes){
             add=true;
         }
-        //qDebug()<<"nn assignes"<<nbNonAssignes<<"k "<<k;
+        ////qDebug()<<"nn assignes"<<nbNonAssignes<<"k "<<k;
         QVector<QVector3D> sommetNonAssignes;
         if(add){
             for(uint i=0;i<indiceNonAssignes.size();i++){
@@ -295,14 +295,14 @@ QVector<NuageDePoint*> NuageDePoint::parseNDP() {
         //Verification convergence sur nombre de changement de classe si on ajoute pas de centroide
         int seuilConvergence=15;
         int nbChangementCentroide=0;
-        qDebug()<<k;
+        //qDebug()<<k;
 
         for(int i=0;i<centroids.size();i++){
             if(oldCentroids[i]!=centroids[i]){
                 nbChangementCentroide++;
             }
         }
-        qDebug()<<nbChangementCentroide<<"cgm";
+        //qDebug()<<nbChangementCentroide<<"cgm";
         if(nbChangementCentroide<seuilConvergence){
             converged=true;
         }
@@ -340,8 +340,8 @@ QVector<NuageDePoint*> NuageDePoint::parseNDP() {
     }
     // Créer les sous-meshes à partir des clusters
     for (int i = 0; i < k; ++i) {
-        qDebug()<<i<<clusters.size();
-        qDebug()<<clusters[i].size();
+        //qDebug()<<i<<clusters.size();
+        //qDebug()<<clusters[i].size();
         // Vérifier si le cluster n'est pas vide
         if (!clusters[i].isEmpty()) {
             NuageDePoint* sousNDP = new NuageDePoint();
@@ -351,12 +351,12 @@ QVector<NuageDePoint*> NuageDePoint::parseNDP() {
                 sousNDP->addColors(colors_[i][j]);
                 sousNDP->addNormals(normals_[i][j]);
             }
-            qDebug() << "Taille sous mesh" << sousNDP->getVertices().size();
+            //qDebug() << "Taille sous mesh" << sousNDP->getVertices().size();
             if(sousNDP->getVertices().size()<NBPOINTSMAX && sousNDP->getVertices().size()>NBPOINTSMIN){
                 allNDP.push_back(sousNDP);
             }
 
-            qDebug() << "Nombre de sous mesh par couleur " << allNDP.size();
+            //qDebug() << "Nombre de sous mesh par couleur " << allNDP.size();
         }
     }
 
@@ -423,7 +423,7 @@ void NuageDePoint::drawGeometry(QOpenGLShaderProgram *program) {
 
 void NuageDePoint::clearNuageDePoint() {
     buildKdtree();
-    qDebug() << "Nombre de vertices avant nettoyage " << vertices.size();
+    //qDebug() << "Nombre de vertices avant nettoyage " << vertices.size();
 
     Pwn_vector points;
     Plane_3 plane;
@@ -433,10 +433,10 @@ void NuageDePoint::clearNuageDePoint() {
         points.push_back(std::make_pair(Kernel::Point_3(vertices[i].x(),vertices[i].y(), vertices[i].z()), Kernel::Vector_3(normals[i].x(), normals[i].y(), normals[i].z())));
     }
     /*
-    qDebug() << "0 vert " << vertices[0];
+    //qDebug() << "0 vert " << vertices[0];
     const Point_with_normal& p = points[0];
     QVector3D vertex(p.first.x(), p.first.y(), p.first.z());
-    qDebug() << "0 point " << vertex;
+    //qDebug() << "0 point " << vertex;
 */
     // Instantiate shape detection engine.
     Efficient_ransac ransac;
@@ -462,8 +462,7 @@ void NuageDePoint::clearNuageDePoint() {
     ransac.detect(parameters);
 
     // Print number of detected shapes.
-    qDebug() << ransac.shapes().end() - ransac.shapes().begin()
-             << " shapes detected." ;
+    //qDebug() << ransac.shapes().end() - ransac.shapes().begin() << " shapes detected." ;
 
     // Récupérer les formes détectées
     const auto& detected_shapes = ransac.shapes();
@@ -477,15 +476,15 @@ void NuageDePoint::clearNuageDePoint() {
         boost::shared_ptr<Efficient_ransac::Shape> shape = *it;
 
         // Utiliser Shape_base::info() pour imprimer les paramètres de la forme détectée
-        qDebug() << (*it)->info();
+        //qDebug() << (*it)->info();
         // Copy indices of assigned points to avoid modifying the original vector
         auto indices = (*it)->indices_of_assigned_points();
         //std::sort(indices.begin(), indices.end(), std::greater<int>());
         /*
-        qDebug() << "index 0 vert" << vertices[indices[0]];
+        //qDebug() << "index 0 vert" << vertices[indices[0]];
         const Point_with_normal& p = points[indices[0]];
         QVector3D vertex(p.first.x(), p.first.y(), p.first.z());
-        qDebug() << "index 0 point " << vertex;
+        //qDebug() << "index 0 point " << vertex;
         */
 
         for (auto index : indices) {
@@ -514,7 +513,7 @@ void NuageDePoint::clearNuageDePoint() {
             ann_point[1]=p.first.y();
             ann_point[2]=p.first.z();
             unsigned int nearest_index = kdtree.nearest(ann_point);
-            //qDebug() << "nearest index : " << nearest_index;
+            ////qDebug() << "nearest index : " << nearest_index;
             indices_to_erase.push_back(nearest_index);
             //colors[nearest_index] = QVector3D(1.0, 1.0, 1.0);
         }
@@ -535,14 +534,14 @@ void NuageDePoint::clearNuageDePoint() {
     points.clear();
     indices_to_erase.clear();
 
-    qDebug() << "Nombre de vertices apres nettoyage " << vertices.size();
+    //qDebug() << "Nombre de vertices apres nettoyage " << vertices.size();
 }
 
 /*
 void NuageDePoint::clearNuageDePoint() {
-    qDebug() << "Nombre de vertices avant nettoyage " << vertices.size();
+    //qDebug() << "Nombre de vertices avant nettoyage " << vertices.size();
     QVector3D dominantColor = getDominantColor(colors);
-    qDebug() << "Couleur dominante " << dominantColor.x()  << dominantColor.y () << dominantColor.z();
+    //qDebug() << "Couleur dominante " << dominantColor.x()  << dominantColor.y () << dominantColor.z();
     for(int i=0; i<vertices.size();){
         float distance = euclidean_distance(dominantColor, colors[i]);
         if(distance < DISTANCE_COULEURS_DOMINANTE){
@@ -553,7 +552,7 @@ void NuageDePoint::clearNuageDePoint() {
             i++;
         }
     }
-    qDebug() << "Nombre de vertices apres nettoyage " << vertices.size();
+    //qDebug() << "Nombre de vertices apres nettoyage " << vertices.size();
 }
 
 */

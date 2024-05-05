@@ -1,88 +1,44 @@
-// Copyright (C) 2016 The Qt Company Ltd.
-// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
-
+// MainWidget.h
 #ifndef MAINWIDGET_H
 #define MAINWIDGET_H
 
-#include "plyFile.h"
-#include "camera.h"
+#include <QWidget>
+#include <QPushButton>
+#include <QLabel>
+#include <QVBoxLayout>
 
-#include <QOpenGLWidget>
-#include <QOpenGLFunctions>
-#include <QMatrix4x4>
-#include <QQuaternion>
-#include <QVector2D>
-#include <QVector>
-#include <QBasicTimer>
-#include <QOpenGLShaderProgram>
-#include <QOpenGLTexture>
+#include "openglWindowWidget.h"
 
-class MainWidget : public QOpenGLWidget, protected QOpenGLFunctions
+class MainWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    using QOpenGLWidget::QOpenGLWidget;
+    MainWidget(QWidget *parent = nullptr);
     ~MainWidget();
 
 protected:
-    void mousePressEvent(QMouseEvent *e) override;
-    void mouseReleaseEvent(QMouseEvent *e) override;
-    void mouseMoveEvent(QMouseEvent *event) override;
-    // void wheelEvent(QMouseEvent *event) override;
-    void timerEvent(QTimerEvent *e) override;
-    void keyReleaseEvent(QKeyEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
-
-    void saveCurrentNuageDePoint();
-    void deleteCurrentNuageDePoint();
-    void clearCurrentNuageDePoint();
-    void switchNuageDePoint();
-    void parseNuageDePoint();
-    void analyseNuageDePoint();
-
-    void updateCamera(QVector3D target);
-
-    void initializeGL() override;
-    void resizeGL(int w, int h) override;
-    void paintGL() override;
-
-    void initShaders();
-    void initTextures();
-
+    void keyReleaseEvent(QKeyEvent *event) override;
 private:
-    QBasicTimer timer;
-    QOpenGLShaderProgram program;
+    QLabel *openNDPLabel;
+    QLabel *saveNDPLabel;
+    QLabel *deleteLabel;
+    QLabel *clearLabel;
+    QLabel *switchLabel;
+    QLabel *parseLabel;
+    QLabel *analyseLabel;
+    QLabel *compareNDPLabel;
 
-    PlyFile *ply =nullptr;
-    QVector<NuageDePoint *> allNuageDePoint;
-    int nextNuageDePointIndice =1;
-    NuageDePoint *currentNuageDePoint;
-    NuageDePoint *ndp;
-
-    NuageDePoint *ndpComparaison;
-    bool afficher_ndpComparaison=false;
-
-    QOpenGLTexture *texture = nullptr;
-
-    Camera camera;
-    QMatrix4x4 viewMatrix;
-    QMatrix4x4 projectionMatrix;
-    QVector3D cameraTarget;
-    QVector3D cameraTarget2;
-    QVector3D cameraUp = QVector3D(0.0, 1.0, 0.0);
-    static unsigned int SCREENWIDTH ;
-    static unsigned int SCREENHEIGHT ;
-    static bool mouseRotatePressed ;
-    static bool mouseMovePressed ;
-    static bool mouseZoomPressed ;
-    static int lastX, lastY, lastZoom;
-    static bool fullScreen ;
-    static bool mainCamera ;
-
-
-    QVector2D mousePressPosition;
-
+    QPushButton *openNDPButton;
+    QPushButton *saveNDPButton;
+    QPushButton* deleteButton;
+    QPushButton* clearButton;
+    QPushButton* switchButton;
+    QPushButton* parseButton;
+    QPushButton* analyseButton;
+    QPushButton* compareNDPButton;
+    OpenGLWindowWidget *openGLWidget;
 };
 
 #endif // MAINWIDGET_H
