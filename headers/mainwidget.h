@@ -9,6 +9,7 @@
 
 #include "openglWindowWidget.h"
 
+
 class MainWidget : public QWidget
 {
     Q_OBJECT

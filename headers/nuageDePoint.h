@@ -4,6 +4,7 @@
 #include <random>
 
 
+#include "headers/mesh.h"
 #include "kdtree.h"
 #include <vector>
 #include <QOpenGLShaderProgram>
@@ -86,6 +87,8 @@ public:
     void bindAndAllocateBuffer();
     void buildKdtree();
 
+    void buildMesh(const std::string& filename);
+
     BasicANNkdTree getKdTree(){return kdtree;}
 
     QVector<NuageDePoint *> parseNuageDePoint();
@@ -102,6 +105,8 @@ public:
 
 private:
     BasicANNkdTree kdtree;
+
+    Mesh mesh;
 
     QVector<QVector3D> vertices;
     QVector<QVector3D> colors;
