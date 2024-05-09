@@ -454,6 +454,7 @@ void OpenGLWindowWidget::handleAnalyseNuageDePoint(){
 
     analyseNuageDePoint();
     actionLabel->hide();
+    update();
 }
 void OpenGLWindowWidget::handleCompareNuageDePoint(){
     afficher_ndpComparaison=!afficher_ndpComparaison;

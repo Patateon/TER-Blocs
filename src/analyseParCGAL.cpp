@@ -147,21 +147,21 @@ void NuageDePoint::analyseNuageDePoint(){
     // Register planar shapes via template method.
     ransac.add_shape_factory<Plane>();
     // Register spherical shapes via template method
-    //   ransac.add_shape_factory<Sphere>();
+    ransac.add_shape_factory<Sphere>();
     /*ransac.add_shape_factory<Cone>();
     ransac.add_shape_factory<Cylinder>();*/
-    //   ransac.add_shape_factory<Torus>();
+    ransac.add_shape_factory<Torus>();
     // Detect registered shapes with default parameters.
     // Set parameters for shape detection.
     Efficient_ransac::Parameters parameters;
     // Set probability to miss the largest primitive at each iteration.
-    parameters.probability = 0.05;
+    parameters.probability = 0.01;
     // Detect shapes with at least 200 points.
-    parameters.min_points = 25000;
+    parameters.min_points = 200;
     // Set maximum Euclidean distance between a point and a shape.
     parameters.epsilon = 0.003;
     // Set maximum Euclidean distance between points to be clustered.
-    parameters.cluster_epsilon = 2;
+    parameters.cluster_epsilon = 0.1;
     // Set maximum normal deviation.
     // 0.8 < dot(surface_normal, point_normal);
     parameters.normal_threshold = 0.8;
@@ -275,6 +275,7 @@ void NuageDePoint::analyseNuageDePoint(){
         qDebug() << "Ni une prise plate, ni un sloper"   ;
         //pas de shape avec bcp de point
     }
+
 }
 
 
