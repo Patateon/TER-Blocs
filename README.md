@@ -1,9 +1,9 @@
-## TER-Blocs
+# TER-Blocs
 Projet TER M1 - Visualisation de blocs en 3D 
 
-## Installation
+# Installation
 
-# Pré-requis 
+## Pré-requis 
 
 - Ne fonctionne que sur linux pour le moment
 - Librarie :
@@ -12,7 +12,7 @@ Projet TER M1 - Visualisation de blocs en 3D
   - MPFR
 - [Qt](https://www.qt.io/download)
 
-# Cloner le dépot
+## Cloner le dépot
 
 Dans le dossier de votre choix
 
@@ -20,6 +20,6 @@ Dans le dossier de votre choix
 git clone https://github.com/Patateon/TER-Blocs.git
 ```
 
-# Ouvrir
+## Ouvrir
 
 File -> Open file or project... -> Sélectionner le .pro dans le dépot précedemment cloner
