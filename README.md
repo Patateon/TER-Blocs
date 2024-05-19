@@ -22,4 +22,4 @@ git clone https://github.com/Patateon/TER-Blocs.git
 
 ## Ouvrir
 
-File -> Open file or project... -> Sélectionner le .pro dans le dépot précedemment cloner
+`File` -> `Open file or project...` -> Sélectionner le .pro dans le dépot précedemment cloner
