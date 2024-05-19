@@ -1,24 +1,30 @@
-#ifdef GL_ES
-// Set default precision to medium
-precision mediump int;
-precision mediump float;
-#endif
+#version 330 core // Use GLSL version 3.30 core profile
 
-uniform mat4 mvp_matrix;
+// Input attributes
+in vec3 vertex;
+in vec3 color;
+in vec3 normal;
 
-attribute vec4 a_position;
-attribute vec2 a_texcoord;
+// Output varying variables to geometry shader
+out vec3 vColor;
+out vec3 vNormal;
+out vec3 vPosition;
 
-varying vec2 v_texcoord;
+// Uniform matrix
+uniform mat4 projection;
+uniform mat4 view;
+uniform mat4 model;
 
-//! [0]
-void main()
-{
-    // Calculate vertex position in screen space
-    gl_Position = mvp_matrix * a_position;
 
-    // Pass texture coordinate to fragment shader
-    // Value will be automatically interpolated to fragments inside polygon faces
-    v_texcoord = a_texcoord;
+void main() {
+    // Pass vertex attributes to geometry shader
+    vColor = color;
+    vNormal = normal;
+    vPosition = vertex;
+
+    // Compute MVP matrix
+    mat4 mvp_matrix = projection * view * model;
+
+    // Transform vertex position
+    gl_Position = mvp_matrix * vec4(vertex, 1.0);
 }
-//! [0]

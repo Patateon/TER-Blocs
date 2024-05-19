@@ -1,55 +1,48 @@
-// Copyright (C) 2016 The Qt Company Ltd.
-// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
-
+// MainWidget.h
 #ifndef MAINWIDGET_H
 #define MAINWIDGET_H
 
-#include "geometryengine.h"
+#include <QWidget>
+#include <QPushButton>
+#include <QLabel>
+#include <QVBoxLayout>
 
-#include <QOpenGLWidget>
-#include <QOpenGLFunctions>
-#include <QMatrix4x4>
-#include <QQuaternion>
-#include <QVector2D>
-#include <QBasicTimer>
-#include <QOpenGLShaderProgram>
-#include <QOpenGLTexture>
+#include "openglWindowWidget.h"
 
-class GeometryEngine;
 
-class MainWidget : public QOpenGLWidget, protected QOpenGLFunctions
+class MainWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    using QOpenGLWidget::QOpenGLWidget;
+    MainWidget(QWidget *parent = nullptr);
     ~MainWidget();
 
 protected:
-    void mousePressEvent(QMouseEvent *e) override;
-    void mouseReleaseEvent(QMouseEvent *e) override;
-    void timerEvent(QTimerEvent *e) override;
-
-    void initializeGL() override;
-    void resizeGL(int w, int h) override;
-    void paintGL() override;
-
-    void initShaders();
-    void initTextures();
-
+    void keyPressEvent(QKeyEvent *event) override;
+    void keyReleaseEvent(QKeyEvent *event) override;
 private:
-    QBasicTimer timer;
-    QOpenGLShaderProgram program;
-    GeometryEngine *geometries = nullptr;
+    QLabel *openNDPLabel;
+    QLabel *saveNDPLabel;
+    QLabel *deleteLabel;
+    QLabel *clearLabel;
+    QLabel *switchLabel;
+    QLabel *parseLabel;
+    QLabel *analyseLabel;
+    QLabel *compareNDPLabel;
+    QLabel *meshPoissonLabel;
 
-    QOpenGLTexture *texture = nullptr;
-
-    QMatrix4x4 projection;
-
-    QVector2D mousePressPosition;
-    QVector3D rotationAxis;
-    qreal angularSpeed = 0;
-    QQuaternion rotation;
+    QPushButton *openNDPButton;
+    QPushButton *saveNDPButton;
+    QPushButton* deleteButton;
+    QPushButton* clearButton;
+    QPushButton* switchButton;
+    QPushButton* parseButton;
+    QPushButton* analyseButton;
+    QPushButton* compareNDPButton;
+    QPushButton* meshPoissonButton;
+    QPushButton* centerCameraButton;
+    OpenGLWindowWidget *openGLWidget;
 };
 
 #endif // MAINWIDGET_H
