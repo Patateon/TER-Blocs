@@ -6,7 +6,7 @@ Projet TER M1 - Visualisation de blocs en 3D
 ## Pré-requis 
 
 - Ne fonctionne que sur linux pour le moment
-- Librarie :
+- Libraries :
   - openGL
   - GMP
   - MPFR
